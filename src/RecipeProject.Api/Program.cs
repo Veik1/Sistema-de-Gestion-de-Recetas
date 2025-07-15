@@ -8,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // JWT config
 
+var jwtSecret = builder.Configuration["Jwt:Key"] ?? "random_key_OneTwoSix";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "RecipeApi";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "RecipeApiUsers";
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -17,8 +21,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "Jwt:Issuer",
-            ValidAudience = "Jwt:Audience",
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("random_key_OneTwoSix"))
         };
     });

@@ -11,4 +11,9 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RecipeProject.Application\RecipeProject.Application.csproj" />
+    <ProjectReference Include="..\RecipeProject.Domain\RecipeProject.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
