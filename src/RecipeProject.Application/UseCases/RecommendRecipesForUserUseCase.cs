@@ -22,8 +22,7 @@ namespace RecipeProject.Application.UseCases
             if (user == null)
                 return new List<Recipe>();
 
-            // Encuentra las categorías más usadas por el usuario
-            var favoriteCategories = user.FavoriteRecipes
+            var favoriteCategoryIds = user.FavoriteRecipes
                 .SelectMany(r => r.Categories)
                 .GroupBy(c => c.Id)
                 .OrderByDescending(g => g.Count())
@@ -31,10 +30,11 @@ namespace RecipeProject.Application.UseCases
                 .Take(3)
                 .ToList();
 
-            // Recomienda recetas de esas categorías que el usuario no haya marcado como favoritas
+            var favoriteRecipeIds = user.FavoriteRecipes.Select(r => r.Id).ToHashSet();
+
             return _recipeRepository.GetAll()
-                .Where(r => r.Categories.Any(c => favoriteCategories.Contains(c.Id)) &&
-                            !user.FavoriteRecipes.Any(fr => fr.Id == r.Id))
+                .Where(r => r.Categories.Any(c => favoriteCategoryIds.Contains(c.Id)) &&
+                            !favoriteRecipeIds.Contains(r.Id))
                 .Take(topN)
                 .ToList();
         }
