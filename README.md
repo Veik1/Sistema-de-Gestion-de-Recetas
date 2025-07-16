@@ -1,6 +1,6 @@
 # Sistema de Gestión de Recetas
 
-Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura en capas y aprovecha contenedores para facilitar su despliegue.
+Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura en capas y aprovecha contenedores **Linux** para facilitar su despliegue en cualquier sistema operativo, tanto Windows (usando Docker Desktop en modo Linux containers) como Linux nativo.
 
 ---
 
@@ -30,6 +30,8 @@ Sistema-de-Gestion-de-Recetas/
 │   ├── RecipeProject.Domain/             # Entidades del dominio
 │   └── RecipeProject.Infrastructure/     # Implementaciones de repositorios y acceso a datos
 │
+├── docker-compose.yml
+├── .env
 └── README.md
 ```
 
@@ -39,23 +41,54 @@ Sistema-de-Gestion-de-Recetas/
 
 ### Requisitos previos
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download) *(solo para desarrollo local sin Docker)*
 - [Docker y Docker Compose](https://docs.docker.com/get-docker/)
+- *(Solo para desarrollo local sin Docker)* [.NET 9 SDK](https://dotnet.microsoft.com/download)
 
 ---
 
 ### Opción 1: Despliegue con Docker Compose (Recomendado)
 
-Levanta toda la solución (API + Base de Datos) con un solo comando, sin instalar nada extra en tu máquina.
+Levanta toda la solución (API + Base de Datos) con un solo comando, sin instalar dependencias extra (excepto Docker y Compose).
 
-1. Clona el repositorio:
+#### **Usuarios de Windows**  
+Usar [Docker Desktop](https://www.docker.com/products/docker-desktop/) en modo **Linux containers** (por defecto).
+
+#### **Usuarios de Linux**  
+Instala Docker y Docker Compose siguiendo la [guía oficial de Docker](https://docs.docker.com/engine/install/), y para Compose:  
+- [Instalación de Docker Compose](https://docs.docker.com/compose/install/)
+
+**Ejemplo rápido para Ubuntu:**
+```bash
+# Instalar Docker Engine
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce
+
+# Instalar Docker Compose plugin
+sudo apt install -y docker-compose-plugin
+
+# Verifica instalación
+docker --version
+docker compose version
+```
+Más detalles en la [documentación oficial](https://docs.docker.com/engine/install/ubuntu/).
+
+---
+
+#### **Pasos para ambos sistemas**
+
+1. **Clona el repositorio:**
     ```bash
     git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
     cd Sistema-de-Gestion-de-Recetas
     ```
 
-2. Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido (ajusta valores si lo deseas):
-
+2. **Crea un archivo `.env` en la raíz del proyecto:**
     ```
     POSTGRES_DB=RecipeDb
     POSTGRES_USER=postgres
@@ -65,18 +98,19 @@ Levanta toda la solución (API + Base de Datos) con un solo comando, sin instala
     JWT_AUDIENCE=RecipeApiUsers
     ```
 
-3. Asegúrate de tener el archivo `docker-compose.yml` (ejemplo incluido abajo).
-
-4. Levanta todo el stack:
+3. **Levanta todo el stack:**
     ```bash
-    docker-compose up --build
+    docker compose up --build
     ```
+    - En versiones antiguas de Compose usa: `docker-compose up --build`
 
-5. La API estará disponible en `http://localhost:8080` y la base de datos en `localhost:5432`.
+4. **Accede a la API y a la documentación interactiva:**  
+   [http://localhost:8080/swagger](http://localhost:8080/swagger)  
+   La base de datos estará en `localhost:5432`.
 
 ---
 
-#### Ejemplo de `docker-compose.yml`
+### Ejemplo de `docker-compose.yml`
 
 ```yaml
 version: "3.9"
@@ -153,9 +187,9 @@ volumes:
 
 ## Extensión y Personalización
 
-- Añade nuevas entidades y casos de uso en los proyectos Domain y Application.
+- Añade nuevas entidades y casos de uso en Domain y Application.
 - Implementa nuevas rutas o lógica en la API.
-- Integra servicios externos (notificaciones, imágenes, etc.) usando la capa Infrastructure.
+- Integra servicios externos usando Infrastructure.
 
 ---
 
@@ -176,6 +210,7 @@ Este proyecto está bajo la licencia MIT.
 
 ## Recursos y documentación
 
+- [Documentación oficial de Docker](https://docs.docker.com/get-docker/)
 - [Documentación oficial de .NET](https://docs.microsoft.com/dotnet/)
 - [Documentación de EF Core](https://learn.microsoft.com/ef/core/)
 - [Swagger/OpenAPI](https://swagger.io/)
