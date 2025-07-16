@@ -1,6 +1,6 @@
 # Sistema de Gestión de Recetas
 
-Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura moderna con C#, ASP.NET Core, Entity Framework Core y PostgreSQL, y preparado para despliegue en contenedores Docker.
+Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura en capas y aprovecha contenedores para facilitar su despliegue.
 
 ---
 
@@ -11,7 +11,7 @@ Este proyecto es un sistema completo para la gestión de recetas culinarias, per
 - **ORM:** Entity Framework Core
 - **Base de datos:** PostgreSQL
 - **Autenticación:** JWT (JSON Web Tokens)
-- **Contenedores:** Docker
+- **Contenedores:** Docker, Docker Compose
 - **Documentación API:** Swagger/OpenAPI
 
 ---
@@ -39,73 +39,105 @@ Sistema-de-Gestion-de-Recetas/
 
 ### Requisitos previos
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download)
-- [Docker](https://www.docker.com/)
-- [PostgreSQL](https://www.postgresql.org/) (o usar Docker para la base de datos)
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
-cd Sistema-de-Gestion-de-Recetas/src/RecipeProject.Api
-```
-
-### 2. Configuración de la base de datos
-
-Crea una base de datos PostgreSQL y asegúrate de tener la cadena de conexión. Por ejemplo:
-
-```
-Host=localhost;Database=RecipeDb;Username=postgres;Password=postgres
-```
-
-Agrega esta cadena en `appsettings.json` o en las variables de entorno del servicio.
-
-### 3. Variables de entorno
-
-- `Jwt:Key`: Clave secreta para JWT
-- `Jwt:Issuer`: Emisor del token
-- `Jwt:Audience`: Audiencia del token
-- `ConnectionStrings:DefaultConnection`: Cadena de conexión a PostgreSQL
-
-Puede establecerse en el entorno o en el archivo de configuración.
-
-### 4. Migrar la base de datos
-
-Desde la carpeta de la API:
-
-```bash
-dotnet ef database update
-```
-
-(Asegúrate de tener instalado el CLI de EF: `dotnet tool install --global dotnet-ef`)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download) *(solo para desarrollo local sin Docker)*
+- [Docker y Docker Compose](https://docs.docker.com/get-docker/)
 
 ---
 
-## Ejecución en Desarrollo
+### Opción 1: Despliegue con Docker Compose (Recomendado)
 
-```bash
-dotnet run
-```
+Levanta toda la solución (API + Base de Datos) con un solo comando, sin instalar nada extra en tu máquina.
 
-La API estará disponible en `http://localhost:8080` (según configuración del Dockerfile y launchSettings).
+1. Clona el repositorio:
+    ```bash
+    git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
+    cd Sistema-de-Gestion-de-Recetas
+    ```
+
+2. Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido (ajusta valores si lo deseas):
+
+    ```
+    POSTGRES_DB=RecipeDb
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=postgres
+    JWT_KEY=random_key_OneTwoSix
+    JWT_ISSUER=RecipeApi
+    JWT_AUDIENCE=RecipeApiUsers
+    ```
+
+3. Asegúrate de tener el archivo `docker-compose.yml` (ejemplo incluido abajo).
+
+4. Levanta todo el stack:
+    ```bash
+    docker-compose up --build
+    ```
+
+5. La API estará disponible en `http://localhost:8080` y la base de datos en `localhost:5432`.
 
 ---
 
-## Uso con Docker
+#### Ejemplo de `docker-compose.yml`
 
-### 1. Construir la imagen
+```yaml
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
 
-```bash
-docker build -t recetas-api .
+  api:
+    build: ./src/RecipeProject.Api
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+
+volumes:
+  db_data:
 ```
 
-### 2. Ejecutar el contenedor
+---
 
-```bash
-docker run -d -p 8080:8080 --env-file .env recetas-api
-```
+### Opción 2: Desarrollo Local (sin Docker)
 
-Crea un archivo `.env` con las variables de entorno necesarias.
+1. Clona el repositorio:
+    ```bash
+    git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
+    cd Sistema-de-Gestion-de-Recetas/src/RecipeProject.Api
+    ```
+
+2. Crea una base de datos PostgreSQL local y obtén la cadena de conexión. Ejemplo:
+    ```
+    Host=localhost;Database=RecipeDb;Username=postgres;Password=postgres
+    ```
+
+3. Configura las variables de entorno necesarias (`Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience`, `ConnectionStrings:DefaultConnection`) en `appsettings.json` o en tu entorno.
+
+4. Aplica las migraciones:
+    ```bash
+    dotnet tool install --global dotnet-ef # solo la primera vez
+    dotnet ef database update
+    ```
+
+5. Ejecuta la API:
+    ```bash
+    dotnet run
+    ```
 
 ---
 
