@@ -1,6 +1,6 @@
 # Sistema de Gestión de Recetas
 
-Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura en capas y aprovecha contenedores **Linux** para facilitar su despliegue en cualquier sistema operativo, tanto Windows (usando Docker Desktop en modo Linux containers) como Linux nativo.
+Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura en capas y aprovecha contenedores **Linux** para facilitar su despliegue en cualquier sistema operativo, tanto Windows como Linux nativo.
 
 ---
 
@@ -51,7 +51,7 @@ Sistema-de-Gestion-de-Recetas/
 Levanta toda la solución (API + Base de Datos) con un solo comando, sin instalar dependencias extra (excepto Docker y Compose).
 
 #### **Usuarios de Windows**  
-Usar [Docker Desktop](https://www.docker.com/products/docker-desktop/) en modo **Linux containers** (por defecto).
+Usar [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 #### **Usuarios de Linux**  
 Instala Docker y Docker Compose siguiendo la [guía oficial de Docker](https://docs.docker.com/engine/install/), y para Compose:  
