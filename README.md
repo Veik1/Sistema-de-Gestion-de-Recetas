@@ -55,7 +55,7 @@ cd Sistema-de-Gestion-de-Recetas/src/RecipeProject.Api
 Crea una base de datos PostgreSQL y asegúrate de tener la cadena de conexión. Por ejemplo:
 
 ```
-Host=localhost;Database=recetas;Username=usuario;Password=contraseña
+Host=localhost;Database=RecipeDb;Username=postgres;Password=postgres
 ```
 
 Agrega esta cadena en `appsettings.json` o en las variables de entorno del servicio.
