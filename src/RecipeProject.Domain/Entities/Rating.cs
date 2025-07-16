@@ -1,3 +1,5 @@
+using System;
+
 namespace RecipeProject.Domain.Entities
 {
     public class Rating
@@ -5,6 +7,9 @@ namespace RecipeProject.Domain.Entities
         public int Id { get; set; }
 
         private int _score;
+        /// <summary>
+        /// Score must be between 1 and 5.
+        /// </summary>
         public int Score
         {
             get => _score;
@@ -16,10 +21,13 @@ namespace RecipeProject.Domain.Entities
             }
         }
 
-        public int UserId { get; set; }
-        public User User { get; set; }
+        public string Review { get; set; }
+        public DateTime Date { get; set; }
 
         public int RecipeId { get; set; }
         public Recipe Recipe { get; set; }
+
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }

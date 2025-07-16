@@ -8,6 +8,6 @@ namespace RecipeProject.Domain.Entities
         public string Name { get; set; }
         public string Icon { get; set; }
 
-        public List<Recipe> Recipes { get; set; } = new List<Recipe>();
+        public List<Recipe> Recipes { get; set; } = new();
     }
 }

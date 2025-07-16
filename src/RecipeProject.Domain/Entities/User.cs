@@ -11,10 +11,10 @@ namespace RecipeProject.Domain.Entities
         public string PasswordHash { get; set; }
         public DateTime RegistrationDate { get; set; }
 
-        public List<Recipe> CreatedRecipes { get; set; } = new List<Recipe>();
-        public List<Recipe> FavoriteRecipes { get; set; } = new List<Recipe>();
-        public List<Comment> Comments { get; set; } = new List<Comment>();
-        public List<Rating> Ratings { get; set; } = new List<Rating>();
-        public List<SearchHistory> SearchHistories { get; set; } = new List<SearchHistory>();
+        public List<Recipe> CreatedRecipes { get; set; } = new();
+        public List<Recipe> FavoriteRecipes { get; set; } = new();
+        public List<Comment> Comments { get; set; } = new();
+        public List<Rating> Ratings { get; set; } = new();
+        public List<SearchHistory> SearchHistories { get; set; } = new();
     }
 }
