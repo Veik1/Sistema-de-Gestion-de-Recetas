@@ -22,17 +22,14 @@ Este proyecto es un sistema completo para la gestión de recetas culinarias, per
 Sistema-de-Gestion-de-Recetas/
 │
 ├── src/
-│   ├── RecipeProject.Api/                # API REST principal
-│   │   ├── Program.cs                    # Configuración de servicios, JWT, DB y Swagger
-│   │   ├── Dockerfile                    # Dockerfile para la API
-│   │   └── ...        
-│   ├── RecipeProject.Application/        # Lógica de aplicación, interfaces y casos de uso
-│   ├── RecipeProject.Domain/             # Entidades del dominio
-│   └── RecipeProject.Infrastructure/     # Implementaciones de repositorios y acceso a datos
+│   ├── RecipeProject.Api/                # API REST principal (.NET, expone endpoints, tiene Dockerfile)
+│   ├── RecipeProject.Application/        # Lógica de aplicación, casos de uso, interfaces de servicios
+│   ├── RecipeProject.Domain/             # Entidades del dominio (modelos, reglas de negocio)
+│   └── RecipeProject.Infrastructure/     # Implementación de repositorios, datos y servicios externos
 │
-├── docker-compose.yml
-├── .env
-└── README.md
+├── docker-compose.yml                    # Orquestación de servicios Docker (API + DB)
+├── .env                                  # Archivo de variables de entorno para Compose
+└── README.md                             # Documentación principal del proyecto
 ```
 
 ---
