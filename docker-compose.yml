@@ -1,25 +1,30 @@
+version: "3.9"
 services:
   db:
     image: postgres:16
+    restart: always
     environment:
-      POSTGRES_DB: RecipeDb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
 
   api:
-    build:
-      context: ./src/RecipeProject.Api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=RecipeDb;Username=postgres;Password=postgres
-    ports:
-      - "8080:8080"
+    image: veik1/sistema-gestion-recetas:latest
     depends_on:
       - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
 
 volumes:
-  pgdata:
+  db_data:
