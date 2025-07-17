@@ -7,7 +7,6 @@ namespace RecipeProject.Domain.Entities
         public int Id { get; set; }
         public string Reason { get; set; }
         public DateTime Date { get; set; }
-
         public bool IsResolved { get; set; }
 
         public int? UserId { get; set; }

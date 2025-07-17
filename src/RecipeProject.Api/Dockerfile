@@ -1,28 +1,33 @@
-# Imagen base oficial de .NET 9 para aplicaciones ASP.NET Core
+# Etapa base: runtime de ASP.NET Core para .NET 9
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-# Imagen para build
+# Etapa build: SDK de .NET 9 para compilar la solución
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copia los archivos de solución y restaura dependencias
-COPY ["RecipeProject.Api/RecipeProject.Api.csproj", "RecipeProject.Api/"]
-COPY ["../RecipeProject.Application/RecipeProject.Application.csproj", "../RecipeProject.Application/"]
-COPY ["../RecipeProject.Infrastructure/RecipeProject.Infrastructure.csproj", "../RecipeProject.Infrastructure/"]
-COPY ["../RecipeProject.Domain/RecipeProject.Domain.csproj", "../RecipeProject.Domain/"]
+# Usar una carpeta local para los paquetes NuGet
+ENV NUGET_PACKAGES=/src/.nuget/packages
 
-RUN dotnet restore "RecipeProject.Api/RecipeProject.Api.csproj"
+# Copia los archivos de proyecto desde el contexto
+COPY src/RecipeProject.Api/RecipeProject.Api.csproj RecipeProject.Api/
+COPY src/RecipeProject.Application/RecipeProject.Application.csproj RecipeProject.Application/
+COPY src/RecipeProject.Infrastructure/RecipeProject.Infrastructure.csproj RecipeProject.Infrastructure/
+COPY src/RecipeProject.Domain/RecipeProject.Domain.csproj RecipeProject.Domain/
+
+# Restaura dependencias
+RUN dotnet restore RecipeProject.Api/RecipeProject.Api.csproj
 
 # Copia el resto del código fuente
-COPY . .
+COPY src/ ./
 
-WORKDIR "/src/RecipeProject.Api"
-RUN dotnet publish "RecipeProject.Api.csproj" -c Release -o /app/publish
+# Publica la aplicación en modo Release
+WORKDIR /src/RecipeProject.Api
+RUN dotnet publish RecipeProject.Api.csproj -c Release -o /app/publish
 
-# Imagen final
+# Etapa final: imagen ligera lista para producción
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .

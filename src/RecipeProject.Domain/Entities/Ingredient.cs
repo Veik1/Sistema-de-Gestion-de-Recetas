@@ -1,3 +1,5 @@
+using System;
+
 namespace RecipeProject.Domain.Entities
 {
     public class Ingredient
