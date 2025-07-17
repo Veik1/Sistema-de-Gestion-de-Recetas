@@ -1,6 +1,22 @@
 # Sistema de Gestión de Recetas
 
-Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administración de recetas culinarias. Permite crear, editar, listar y eliminar recetas, ingredientes y categorías, además de consultar información detallada de cada receta.
+Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administración de recetas culinarias. Permite crear, editar, listar y eliminar recetas, ingredientes y categorías, además de administrar usuarios y autenticación (si está habilitada).
+
+---
+
+## Tabla de contenido
+
+- [Características principales](#características-principales)
+- [Requisitos previos](#requisitos-previos)
+- [Configuración inicial](#configuración-inicial)
+- [Migraciones de la base de datos](#migraciones-de-la-base-de-datos)
+- [Ejecución con Docker](#ejecución-con-docker)
+- [Pruebas y uso con Swagger](#pruebas-y-uso-con-swagger)
+- [Endpoints principales](#endpoints-principales)
+- [Desarrollo](#desarrollo)
+- [FAQ](#faq)
+- [Licencia](#licencia)
+- [Créditos](#créditos)
 
 ---
 
@@ -8,7 +24,8 @@ Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administr
 
 - CRUD completo de recetas, ingredientes y categorías.
 - API RESTful basada en ASP.NET Core.
-- Autenticación (si aplica).
+- Autenticación JWT (opcional, configurable desde `appsettings.json` y `appsettings.Development.json`).  
+  > Si no configuras la sección `Jwt`, la autenticación estará deshabilitada.
 - Documentación automática con Swagger.
 - Despliegue sencillo usando Docker.
 - Migraciones de base de datos con Entity Framework Core.
@@ -70,8 +87,6 @@ Este proyecto utiliza **Entity Framework Core** para el manejo de migraciones.
 
 ### 1. Crear una migración nueva
 
-Ejecuta el siguiente comando desde la raíz del repositorio para crear una nueva migración (ejemplo: “Inicial”):
-
 ```bash
 dotnet ef migrations add Inicial \
   --project src/RecipeProject.Infrastructure \
@@ -80,17 +95,13 @@ dotnet ef migrations add Inicial \
 
 ### 2. Aplicar las migraciones a la base de datos
 
-Ejecuta el siguiente comando para aplicar las migraciones y crear la base de datos:
-
 ```bash
 dotnet ef database update \
   --project src/RecipeProject.Infrastructure \
   --startup-project src/RecipeProject.Api
 ```
 
-> **Tambien veremos como aplicar las migraciones desde docker en el paso siguente**
-
----
+> **También puedes aplicar las migraciones desde Docker en el paso siguiente**
 
 **Notas:**
 - Repite el paso 1 cada vez que cambies el modelo de datos.
@@ -107,7 +118,6 @@ dotnet ef database update \
 docker build -t recetas-app .
 docker run -d -p 8080:80 --name recetas-app recetas-app
 ```
-
 > Cambia el puerto si lo necesitas.
 
 ### 2. Variables de entorno en Docker
@@ -129,7 +139,6 @@ docker exec -it recetas-app dotnet ef database update \
   --project src/RecipeProject.Infrastructure \
   --startup-project src/RecipeProject.Api
 ```
-
 > **Si le pusiste otro nombre al container, o dejaste el default, cambiar recetas-app por el nombre correspondiente**
 
 ---
@@ -144,7 +153,9 @@ http://localhost:8080/swagger
 
 ---
 
-## Endpoints principales y ejemplos JSON para Swagger
+## Endpoints principales
+
+A continuación se muestran ejemplos de los principales endpoints expuestos por la API y ejemplos de JSON para Swagger.
 
 ### Recetas
 
@@ -363,7 +374,7 @@ http://localhost:8080/swagger
 
 ---
 
-> En Swagger puedes probar todos los endpoints, enviar peticiones y ver ejemplos de JSON de entrada/salida.
+> Puedes probar todos los endpoints y ejemplos directamente desde Swagger.
 
 ---
 
@@ -379,10 +390,8 @@ http://localhost:8080/swagger
 
 - **¿Puedo usar otra base de datos?**  
   Sí, solo cambia la cadena de conexión y el proveedor de EF Core.
-
 - **¿Cómo agrego una migración desde Docker?**  
   Usa `docker exec` como se mostró arriba.
-
 - **¿Dónde veo la documentación de la API?**  
   En `/swagger` después de levantar el contenedor.
 
