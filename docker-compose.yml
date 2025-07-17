@@ -1,18 +1,30 @@
+<<<<<<< HEAD
 version: '3.8'
 
+=======
+version: "3.9"
+>>>>>>> a9b481c0645a557dec44fefadab213a92d85a39b
 services:
   db:
     image: postgres:16
+    restart: always
     environment:
+<<<<<<< HEAD
       POSTGRES_DB: RecipeDb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: 1234
+=======
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+>>>>>>> a9b481c0645a557dec44fefadab213a92d85a39b
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
 
   api:
+<<<<<<< HEAD
     build:
       context: .
       dockerfile: src/RecipeProject.Api/Dockerfile
@@ -21,8 +33,20 @@ services:
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=RecipeDb;Username=user;Password=1234
     ports:
       - "8080:8080"
+=======
+    image: veik1/sistema-gestion-recetas:latest
+>>>>>>> a9b481c0645a557dec44fefadab213a92d85a39b
     depends_on:
       - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
 
 volumes:
-  pgdata:
+  db_data:
