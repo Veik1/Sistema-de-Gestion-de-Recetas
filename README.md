@@ -1,218 +1,399 @@
 # Sistema de Gestión de Recetas
 
-Este proyecto es un sistema completo para la gestión de recetas culinarias, permitiendo a los usuarios crear, consultar, comentar, calificar y reportar recetas. El sistema está construido sobre una arquitectura en capas y aprovecha contenedores **Linux** para facilitar su despliegue en cualquier sistema operativo, tanto Windows como Linux nativo.
+Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administración de recetas culinarias. Permite crear, editar, listar y eliminar recetas, ingredientes y categorías, además de consultar información detallada de cada receta.
 
 ---
 
-## Tecnologías Utilizadas
+## Características principales
 
-- **Lenguaje principal:** C# (.NET 9)
-- **Framework Backend:** ASP.NET Core
-- **ORM:** Entity Framework Core
-- **Base de datos:** PostgreSQL
-- **Autenticación:** JWT (JSON Web Tokens)
-- **Contenedores:** Docker, Docker Compose
-- **Documentación API:** Swagger/OpenAPI
-
----
-
-## Estructura del Proyecto
-
-```
-Sistema-de-Gestion-de-Recetas/
-│
-├── src/
-│   ├── RecipeProject.Api/                # API REST principal (.NET, expone endpoints, tiene Dockerfile)
-│   ├── RecipeProject.Application/        # Lógica de aplicación, casos de uso, interfaces de servicios
-│   ├── RecipeProject.Domain/             # Entidades del dominio (modelos, reglas de negocio)
-│   └── RecipeProject.Infrastructure/     # Implementación de repositorios, datos y servicios externos
-│
-├── docker-compose.yml                    # Orquestación de servicios Docker (API + DB)
-├── .env                                  # Archivo de variables de entorno para Compose
-└── README.md                             # Documentación principal del proyecto
-```
+- CRUD completo de recetas, ingredientes y categorías.
+- API RESTful basada en ASP.NET Core.
+- Autenticación (si aplica).
+- Documentación automática con Swagger.
+- Despliegue sencillo usando Docker.
+- Migraciones de base de datos con Entity Framework Core.
 
 ---
 
-## Instalación y Configuración
+## Requisitos previos
 
-### Requisitos previos
-
-- [Docker y Docker Compose](https://docs.docker.com/get-docker/)
-- *(Solo para desarrollo local sin Docker)* [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) o superior
+- [Docker](https://www.docker.com/get-started)
+- [Git](https://git-scm.com/)
+- (Opcional) [Visual Studio](https://visualstudio.microsoft.com/) o [VS Code](https://code.visualstudio.com/)
 
 ---
 
-### Opción 1: Despliegue con Docker Compose (Recomendado)
+## Configuración inicial
 
-Levanta toda la solución (API + Base de Datos) con un solo comando, sin instalar dependencias extra (excepto Docker y Compose).
+### 1. Clona el repositorio
 
-#### **Usuarios de Windows**  
-Usar [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
-#### **Usuarios de Linux**  
-Instala Docker y Docker Compose siguiendo la [guía oficial de Docker](https://docs.docker.com/engine/install/), y para Compose:  
-- [Instalación de Docker Compose](https://docs.docker.com/compose/install/)
-
-**Ejemplo rápido para Ubuntu:**
 ```bash
-# Instalar Docker Engine
-sudo apt update
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce
-
-# Instalar Docker Compose plugin
-sudo apt install -y docker-compose-plugin
-
-# Verifica instalación
-docker --version
-docker compose version
-```
-Más detalles en la [documentación oficial](https://docs.docker.com/engine/install/ubuntu/).
-
----
-
-#### **Pasos para ambos sistemas**
-
-1. **Clona el repositorio:**
-    ```bash
-    git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
-    cd Sistema-de-Gestion-de-Recetas
-    ```
-
-2. **Crea un archivo `.env` en la raíz del proyecto:**
-    ```
-    POSTGRES_DB=RecipeDb
-    POSTGRES_USER=postgres
-    POSTGRES_PASSWORD=postgres
-    JWT_KEY=random_key_OneTwoSix
-    JWT_ISSUER=RecipeApi
-    JWT_AUDIENCE=RecipeApiUsers
-    ```
-
-3. **Levanta todo el stack:**
-    ```bash
-    docker compose up --build
-    ```
-    - En versiones antiguas de Compose usa: `docker-compose up --build`
-
-4. **Accede a la API y a la documentación interactiva:**  
-   [http://localhost:8080/swagger](http://localhost:8080/swagger)  
-   La base de datos estará en `localhost:5432`.
-
----
-
-### Ejemplo de `docker-compose.yml`
-
-```yaml
-version: "3.9"
-services:
-  db:
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
-  api:
-    build: ./src/RecipeProject.Api
-    depends_on:
-      - db
-    environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - Jwt__Key=${JWT_KEY}
-      - Jwt__Issuer=${JWT_ISSUER}
-      - Jwt__Audience=${JWT_AUDIENCE}
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
-
-volumes:
-  db_data:
+git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
+cd Sistema-de-Gestion-de-Recetas
 ```
 
----
+### 2. Configura el archivo `appsettings.Development.json`
 
-### Opción 2: Desarrollo Local (sin Docker)
+Crea el archivo `appsettings.Development.json` en la raíz del proyecto (junto a `appsettings.json`). Ejemplo de configuración:
 
-1. Clona el repositorio:
-    ```bash
-    git clone https://github.com/Veik1/Sistema-de-Gestion-de-Recetas.git
-    cd Sistema-de-Gestion-de-Recetas/src/RecipeProject.Api
-    ```
-
-2. Crea una base de datos PostgreSQL local y obtén la cadena de conexión. Ejemplo:
-    ```
-    Host=localhost;Database=RecipeDb;Username=postgres;Password=postgres
-    ```
-
-3. Configura las variables de entorno necesarias (`Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience`, `ConnectionStrings:DefaultConnection`) en `appsettings.json` o en tu entorno.
-
-4. Aplica las migraciones:
-    ```bash
-    dotnet tool install --global dotnet-ef # solo la primera vez
-    dotnet ef database update
-    ```
-
-5. Ejecuta la API:
-    ```bash
-    dotnet run
-    ```
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=RecipeDb;Username=user;Password=1234"
+  },
+  "Jwt": {
+    "Key": "dev_key_OneTwoSix_1234567890abcdef",
+    "Issuer": "RecipeApiDev",
+    "Audience": "RecipeApiUsersDev"
+  }
+}
+```
+> **Recuerda:** Cambia los datos de usuario, contraseña y nombre de la base según tu entorno.
 
 ---
 
-## Funcionalidades Principales
+## Migraciones de la base de datos
 
-- CRUD de usuarios, recetas, categorías, ingredientes y comentarios
-- Calificación y reportes de recetas
-- Autenticación y autorización JWT
-- Documentación interactiva de la API con Swagger
-- Arquitectura en capas (Domain, Application, Infrastructure, Api)
+Este proyecto utiliza **Entity Framework Core** para el manejo de migraciones.
+
+### Estructura típica de carpetas
+
+- `src/RecipeProject.Infrastructure` — Contiene el contexto de datos y las migraciones.
+- `src/RecipeProject.Api` — Proyecto API principal (el que arranca la aplicación).
+
+### 1. Crear una migración nueva
+
+Ejecuta el siguiente comando desde la raíz del repositorio para crear una nueva migración (ejemplo: “Inicial”):
+
+```bash
+dotnet ef migrations add Inicial \
+  --project src/RecipeProject.Infrastructure \
+  --startup-project src/RecipeProject.Api
+```
+
+### 2. Aplicar las migraciones a la base de datos
+
+Ejecuta el siguiente comando para aplicar las migraciones y crear la base de datos:
+
+```bash
+dotnet ef database update \
+  --project src/RecipeProject.Infrastructure \
+  --startup-project src/RecipeProject.Api
+```
+
+> **Tambien veremos como aplicar las migraciones desde docker en el paso siguente**
 
 ---
 
-## Extensión y Personalización
-
-- Añade nuevas entidades y casos de uso en Domain y Application.
-- Implementa nuevas rutas o lógica en la API.
-- Integra servicios externos usando Infrastructure.
+**Notas:**
+- Repite el paso 1 cada vez que cambies el modelo de datos.
+- Repite el paso 2 para aplicar los cambios en la base de datos.
+- La estructura de carpetas puede variar según tu proyecto. Ajusta los paths si es necesario.
 
 ---
 
-## Contribución
+## Ejecución con Docker
 
-1. Haz un fork del repositorio.
-2. Crea una rama (`git checkout -b feature/nueva-funcion`)
-3. Realiza tus cambios y haz commit.
-4. Abre un Pull Request.
+### 1. Build & Run
+
+```bash
+docker build -t recetas-app .
+docker run -d -p 8080:80 --name recetas-app recetas-app
+```
+
+> Cambia el puerto si lo necesitas.
+
+### 2. Variables de entorno en Docker
+
+Puedes pasar variables de conexión usando `-e` en el `docker run`:
+
+```bash
+docker run -d -p 8080:80 --name recetas-app \
+    -e ConnectionStrings__DefaultConnection="Server=db;Database=RecetasDb;User Id=sa;Password=YourStrong!Passw0rd;" \
+    recetas-app
+```
+
+### 3. Migraciones desde Docker
+
+Si tienes el entorno corriendo en Docker y el contenedor tiene las herramientas de EF Core instaladas, ejecuta:
+
+```bash
+docker exec -it recetas-app dotnet ef database update \
+  --project src/RecipeProject.Infrastructure \
+  --startup-project src/RecipeProject.Api
+```
+
+> **Si le pusiste otro nombre al container, o dejaste el default, cambiar recetas-app por el nombre correspondiente**
+
+---
+
+## Pruebas y uso con Swagger
+
+El proyecto expone la documentación Swagger en:
+
+```
+http://localhost:8080/swagger
+```
+
+---
+
+## Endpoints principales y ejemplos JSON para Swagger
+
+### Recetas
+
+- **GET /api/Recetas** — Lista todas las recetas
+
+**Respuesta:**
+```json
+[
+  {
+    "id": 1,
+    "nombre": "Ensalada César",
+    "descripcion": "Clásica ensalada con pollo y crutones.",
+    "ingredientes": [
+      {
+        "id": 1,
+        "nombre": "Lechuga",
+        "cantidad": "1 unidad"
+      },
+      {
+        "id": 2,
+        "nombre": "Pollo",
+        "cantidad": "200g"
+      }
+    ],
+    "categoria": {
+      "id": 2,
+      "nombre": "Ensaladas"
+    }
+  }
+]
+```
+
+- **GET /api/Recetas/{id}** — Busca receta por ID
+
+**Respuesta:**
+```json
+{
+  "id": 1,
+  "nombre": "Ensalada César",
+  "descripcion": "Clásica ensalada con pollo y crutones.",
+  "ingredientes": [
+    {
+      "id": 1,
+      "nombre": "Lechuga",
+      "cantidad": "1 unidad"
+    },
+    {
+      "id": 2,
+      "nombre": "Pollo",
+      "cantidad": "200g"
+    }
+  ],
+  "categoria": {
+    "id": 2,
+    "nombre": "Ensaladas"
+  }
+}
+```
+
+- **POST /api/Recetas** — Crea una receta
+
+**JSON de ejemplo:**
+```json
+{
+  "nombre": "Ensalada César",
+  "descripcion": "Clásica ensalada con pollo y crutones.",
+  "ingredientes": [
+    {
+      "nombre": "Lechuga",
+      "cantidad": "1 unidad"
+    },
+    {
+      "nombre": "Pollo",
+      "cantidad": "200g"
+    }
+  ],
+  "categoriaId": 2
+}
+```
+
+- **PUT /api/Recetas/{id}** — Edita una receta
+
+**JSON de ejemplo:**
+```json
+{
+  "nombre": "Ensalada César Deluxe",
+  "descripcion": "Ensalada César con extra pollo.",
+  "ingredientes": [
+    {
+      "nombre": "Lechuga",
+      "cantidad": "1 unidad"
+    },
+    {
+      "nombre": "Pollo",
+      "cantidad": "300g"
+    },
+    {
+      "nombre": "Crutones",
+      "cantidad": "50g"
+    }
+  ],
+  "categoriaId": 2
+}
+```
+
+- **DELETE /api/Recetas/{id}** — Elimina una receta
+
+**Respuesta:**  
+`204 No Content`
+
+---
+
+### Ingredientes
+
+- **GET /api/Ingredientes** — Lista todos los ingredientes
+
+**Respuesta:**
+```json
+[
+  {
+    "id": 1,
+    "nombre": "Lechuga"
+  },
+  {
+    "id": 2,
+    "nombre": "Pollo"
+  }
+]
+```
+
+- **GET /api/Ingredientes/{id}** — Busca ingrediente por ID
+
+**Respuesta:**
+```json
+{
+  "id": 1,
+  "nombre": "Lechuga"
+}
+```
+
+- **POST /api/Ingredientes** — Crea un ingrediente
+
+**JSON de ejemplo:**
+```json
+{
+  "nombre": "Tomate"
+}
+```
+
+- **PUT /api/Ingredientes/{id}** — Edita un ingrediente
+
+**JSON de ejemplo:**
+```json
+{
+  "nombre": "Tomate Cherry"
+}
+```
+
+- **DELETE /api/Ingredientes/{id}** — Elimina un ingrediente
+
+**Respuesta:**  
+`204 No Content`
+
+---
+
+### Categorías
+
+- **GET /api/Categorias** — Lista todas las categorías
+
+**Respuesta:**
+```json
+[
+  {
+    "id": 1,
+    "nombre": "Plato Principal"
+  },
+  {
+    "id": 2,
+    "nombre": "Ensaladas"
+  }
+]
+```
+
+- **GET /api/Categorias/{id}** — Busca categoría por ID
+
+**Respuesta:**
+```json
+{
+  "id": 2,
+  "nombre": "Ensaladas"
+}
+```
+
+- **POST /api/Categorias** — Crea una categoría
+
+**JSON de ejemplo:**
+```json
+{
+  "nombre": "Postres"
+}
+```
+
+- **PUT /api/Categorias/{id}** — Edita una categoría
+
+**JSON de ejemplo:**
+```json
+{
+  "nombre": "Entradas"
+}
+```
+
+- **DELETE /api/Categorias/{id}** — Elimina una categoría
+
+**Respuesta:**  
+`204 No Content`
+
+---
+
+> En Swagger puedes probar todos los endpoints, enviar peticiones y ver ejemplos de JSON de entrada/salida.
+
+---
+
+## Desarrollo
+
+- Las capas principales están en las carpetas `Controllers`, `Models`, `Data` y `Services`.
+- Puedes extender el modelo agregando nuevas migraciones y ejecutando `dotnet ef database update`.
+- Para desarrollo local, usa el perfil `Development` y configura tu `appsettings.Development.json`.
+
+---
+
+## FAQ
+
+- **¿Puedo usar otra base de datos?**  
+  Sí, solo cambia la cadena de conexión y el proveedor de EF Core.
+
+- **¿Cómo agrego una migración desde Docker?**  
+  Usa `docker exec` como se mostró arriba.
+
+- **¿Dónde veo la documentación de la API?**  
+  En `/swagger` después de levantar el contenedor.
 
 ---
 
 ## Licencia
 
-Este proyecto está bajo la licencia MIT.
+Este proyecto es de uso personal y educativo. Si deseas contribuir, ¡envía tu PR!
 
 ---
 
-## Recursos y documentación
+## Créditos
 
-- [Documentación oficial de Docker](https://docs.docker.com/get-docker/)
-- [Documentación oficial de .NET](https://docs.microsoft.com/dotnet/)
-- [Documentación de EF Core](https://learn.microsoft.com/ef/core/)
-- [Swagger/OpenAPI](https://swagger.io/)
-
----
-
-**Autor:** Veik1  
-**Repositorio original:** https://github.com/Veik1/Sistema-de-Gestion-de-Recetas
+Desarrollado por [Veik1](https://github.com/Veik1).

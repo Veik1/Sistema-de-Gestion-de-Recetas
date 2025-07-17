@@ -3,10 +3,10 @@ name: Build and Push Docker image
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-push:
@@ -25,14 +25,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image (with JWT secrets)
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./src/RecipeProject.Api
           file: ./src/RecipeProject.Api/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sistema-gestion-recetas:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/sistema-gestion-recetas:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/sistema-gestion-recetas:${{ github.sha }}
           build-args: |
             JWT_KEY=${{ secrets.JWT_KEY }}
             JWT_ISSUER=${{ secrets.JWT_ISSUER }}
             JWT_AUDIENCE=${{ secrets.JWT_AUDIENCE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
