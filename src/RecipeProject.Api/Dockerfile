@@ -25,8 +25,4 @@ RUN dotnet publish RecipeProject.Api.csproj -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-<<<<<<< HEAD
 ENTRYPOINT ["dotnet", "RecipeProject.Api.dll"]
-=======
-ENTRYPOINT ["dotnet", "RecipeProject.Api.dll"]
->>>>>>> 2ed7b22ecf7396b98481ede4584d78bdb85baef0

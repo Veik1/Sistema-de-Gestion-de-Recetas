@@ -25,8 +25,5 @@ services:
       - db
 
 volumes:
-<<<<<<< HEAD
   pgdata:
-=======
-  pgdata:
->>>>>>> 2ed7b22ecf7396b98481ede4584d78bdb85baef0
+
