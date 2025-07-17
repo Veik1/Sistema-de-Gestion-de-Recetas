@@ -35,19 +35,23 @@ cd Sistema-de-Gestion-de-Recetas
 
 ### 2. Configura el archivo `appsettings.Development.json`
 
-Crea el archivo `appsettings.Development.json` en la raíz del proyecto (junto a `appsettings.json`). Ejemplo de configuración para SQL Server:
+Crea el archivo `appsettings.Development.json` en la raíz del proyecto (junto a `appsettings.json`). Ejemplo de configuración:
 
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=RecetasDb;User Id=sa;Password=YourStrong!Passw0rd;"
-  },
   "Logging": {
     "LogLevel": {
-      "Default": "Information",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Information"
     }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=RecipeDb;Username=user;Password=1234"
+  },
+  "Jwt": {
+    "Key": "dev_key_OneTwoSix_1234567890abcdef",
+    "Issuer": "RecipeApiDev",
+    "Audience": "RecipeApiUsersDev"
   }
 }
 ```
@@ -59,23 +63,39 @@ Crea el archivo `appsettings.Development.json` en la raíz del proyecto (junto a
 
 Este proyecto utiliza **Entity Framework Core** para el manejo de migraciones.
 
+### Estructura típica de carpetas
+
+- `src/RecipeProject.Infrastructure` — Contiene el contexto de datos y las migraciones.
+- `src/RecipeProject.Api` — Proyecto API principal (el que arranca la aplicación).
+
 ### 1. Crear una migración nueva
 
-```bash
-dotnet ef migrations add Inicial
-```
-
-### 2. Aplicar las migraciones a la base
+Ejecuta el siguiente comando desde la raíz del repositorio para crear una nueva migración (ejemplo: “Inicial”):
 
 ```bash
-dotnet ef database update
+dotnet ef migrations add Inicial \
+  --project src/RecipeProject.Infrastructure \
+  --startup-project src/RecipeProject.Api
 ```
 
-> Si usas Docker, las migraciones se pueden ejecutar desde el contenedor usando:
+### 2. Aplicar las migraciones a la base de datos
+
+Ejecuta el siguiente comando para aplicar las migraciones y crear la base de datos:
+
 ```bash
-docker exec -it <nombre_contenedor> dotnet ef database update
+dotnet ef database update \
+  --project src/RecipeProject.Infrastructure \
+  --startup-project src/RecipeProject.Api
 ```
-Asegúrate de que el contenedor tenga las herramientas de EF Core instaladas.
+
+> **Tambien veremos como aplicar las migraciones desde docker en el paso siguente**
+
+---
+
+**Notas:**
+- Repite el paso 1 cada vez que cambies el modelo de datos.
+- Repite el paso 2 para aplicar los cambios en la base de datos.
+- La estructura de carpetas puede variar según tu proyecto. Ajusta los paths si es necesario.
 
 ---
 
@@ -99,6 +119,18 @@ docker run -d -p 8080:80 --name recetas-app \
     -e ConnectionStrings__DefaultConnection="Server=db;Database=RecetasDb;User Id=sa;Password=YourStrong!Passw0rd;" \
     recetas-app
 ```
+
+### 3. Migraciones desde Docker
+
+Si tienes el entorno corriendo en Docker y el contenedor tiene las herramientas de EF Core instaladas, ejecuta:
+
+```bash
+docker exec -it recetas-app dotnet ef database update \
+  --project src/RecipeProject.Infrastructure \
+  --startup-project src/RecipeProject.Api
+```
+
+> **Si le pusiste otro nombre al container, o dejaste el default, cambiar recetas-app por el nombre correspondiente**
 
 ---
 
