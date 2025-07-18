@@ -157,105 +157,36 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 
 **Respuesta:**
 ```json
-[
-  {
-    "id": 1,
-    "nombre": "Ensalada César",
-    "descripcion": "Clásica ensalada con pollo y crutones.",
-    "ingredientes": [
-      {
-        "id": 1,
-        "nombre": "Lechuga",
-        "cantidad": "1 unidad"
-      },
-      {
-        "id": 2,
-        "nombre": "Pollo",
-        "cantidad": "200g"
-      }
-    ],
-    "categoria": {
-      "id": 2,
-      "nombre": "Ensaladas"
-    }
-  }
-]
+
+FALTA AGREGAR DATOS
+
 ```
 
 - **GET /api/Recipes/{id}** — Busca receta por ID
 
 **Respuesta:**
 ```json
-{
-  "id": 1,
-  "nombre": "Ensalada César",
-  "descripcion": "Clásica ensalada con pollo y crutones.",
-  "ingredientes": [
-    {
-      "id": 1,
-      "nombre": "Lechuga",
-      "cantidad": "1 unidad"
-    },
-    {
-      "id": 2,
-      "nombre": "Pollo",
-      "cantidad": "200g"
-    }
-  ],
-  "categoria": {
-    "id": 2,
-    "nombre": "Ensaladas"
-  }
-}
+
+FALTA AGREGAR DATOS
+
 ```
 
 - **POST /api/Recipes** — Crea una receta
 
 **JSON de ejemplo:**
 ```json
-{
-  "title": "Ensalada César",
-  "instructions": "Clásica ensalada con pollo y crutones.",
-  "imageUrl": "https://imag.bonviveur.com/presentacion-de-la-ensalada-de-aguacate.jpg",
-  "isGeneratedByAI": false,
-  "userId": 1,
-  "user": {
-    "id": 1,
-    "name": "fa",
-    "email": "fafafa@noreply.com",
-    "passwordHash": "hash",
-    "registrationDate": "2025-07-18T00:00:00Z"
-  },
-  "ingredients":   "ingredients": [
-    { "name": "Lechuga", "quantity": "1 unidad" },
-    { "name": "Pollo", "quantity": "200g" }
-  ]
-}
+
+FALTA AGREGAR DATOS
+
 ```
 
 - **PUT /api/Recipes/{id}** — Edita una receta
 
 **JSON de ejemplo:**
 ```json
-{
-  "nombre": "Ensalada César Deluxe",
-  "descripcion": "Ensalada César con extra pollo.",
-  "ingredientes": [
-    {
-      "nombre": "Lechuga",
-      "cantidad": "1 unidad"
-    },
-    {
-      "nombre": "Pollo",
-      "cantidad": "300g"
-    },
-    {
-      "nombre": "Crutones",
-      "cantidad": "50g"
-    }
-  ],
-  "categoriaId": 2
-}
+
+FALTA AGREGAR DATOS
+
 ```
 
 - **DELETE /api/Recetas/{id}** — Elimina una receta
