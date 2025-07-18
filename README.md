@@ -176,7 +176,17 @@ FALTA AGREGAR DATOS
 **JSON de ejemplo:**
 ```json
 
-FALTA AGREGAR DATOS
+{
+  "title": "Ensalada César",
+  "instructions": "Clásica ensalada con pollo y crutones.",
+  "imageUrl": "https://ejemplo.com/ensalada.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "ingredients": [
+    { "name": "Lechuga", "quantity": "1 unidad" },
+    { "name": "Pollo", "quantity": "200g" }
+  ]
+}
 
 ```
 
