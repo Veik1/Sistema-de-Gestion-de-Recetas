@@ -88,17 +88,13 @@ Este proyecto utiliza **Entity Framework Core** para el manejo de migraciones.
 ### 1. Crear una migración nueva
 
 ```bash
-dotnet ef migrations add Inicial \
-  --project src/RecipeProject.Infrastructure \
-  --startup-project src/RecipeProject.Api
+dotnet ef migrations add Inicial --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
 
 ### 2. Aplicar las migraciones a la base de datos
 
 ```bash
-dotnet ef database update \
-  --project src/RecipeProject.Infrastructure \
-  --startup-project src/RecipeProject.Api
+dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
 
 > **También puedes aplicar las migraciones desde Docker en el paso siguiente**
@@ -135,9 +131,7 @@ docker run -d -p 8080:80 --name recetas-app \
 Si tienes el entorno corriendo en Docker y el contenedor tiene las herramientas de EF Core instaladas, ejecuta:
 
 ```bash
-docker exec -it recetas-app dotnet ef database update \
-  --project src/RecipeProject.Infrastructure \
-  --startup-project src/RecipeProject.Api
+docker exec -it recetas-app dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
 > **Si le pusiste otro nombre al container, o dejaste el default, cambiar recetas-app por el nombre correspondiente**
 
@@ -159,7 +153,7 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 
 ### Recetas
 
-- **GET /api/Recetas** — Lista todas las recetas
+- **GET /api/Recipes** — Lista todas las recetas
 
 **Respuesta:**
 ```json
@@ -188,7 +182,7 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 ]
 ```
 
-- **GET /api/Recetas/{id}** — Busca receta por ID
+- **GET /api/Recipes/{id}** — Busca receta por ID
 
 **Respuesta:**
 ```json
@@ -215,28 +209,31 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 }
 ```
 
-- **POST /api/Recetas** — Crea una receta
+- **POST /api/Recipes** — Crea una receta
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Ensalada César",
-  "descripcion": "Clásica ensalada con pollo y crutones.",
-  "ingredientes": [
-    {
-      "nombre": "Lechuga",
-      "cantidad": "1 unidad"
-    },
-    {
-      "nombre": "Pollo",
-      "cantidad": "200g"
-    }
-  ],
-  "categoriaId": 2
+  "title": "Ensalada César",
+  "instructions": "Clásica ensalada con pollo y crutones.",
+  "imageUrl": "https://imag.bonviveur.com/presentacion-de-la-ensalada-de-aguacate.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "user": {
+    "id": 1,
+    "name": "fa",
+    "email": "fafafa@noreply.com",
+    "passwordHash": "hash",
+    "registrationDate": "2025-07-18T00:00:00Z"
+  },
+  "ingredients":   "ingredients": [
+    { "name": "Lechuga", "quantity": "1 unidad" },
+    { "name": "Pollo", "quantity": "200g" }
+  ]
 }
 ```
 
-- **PUT /api/Recetas/{id}** — Edita una receta
+- **PUT /api/Recipes/{id}** — Edita una receta
 
 **JSON de ejemplo:**
 ```json
@@ -270,7 +267,7 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 
 ### Ingredientes
 
-- **GET /api/Ingredientes** — Lista todos los ingredientes
+- **GET /api/Ingredients** — Lista todos los ingredientes
 
 **Respuesta:**
 ```json
@@ -286,7 +283,7 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 ]
 ```
 
-- **GET /api/Ingredientes/{id}** — Busca ingrediente por ID
+- **GET /api/Ingredients/{id}** — Busca ingrediente por ID
 
 **Respuesta:**
 ```json
@@ -296,25 +293,34 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 }
 ```
 
-- **POST /api/Ingredientes** — Crea un ingrediente
+- **POST /api/Ingredients** — Crea un ingrediente
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Tomate"
+  "name": "Lechuga",
+  "quantity": "1 unidad"
 }
 ```
 
-- **PUT /api/Ingredientes/{id}** — Edita un ingrediente
+```json
+{
+  "name": "Pollo",
+  "quantity": "200g"
+}
+```
+
+- **PUT /api/Ingredients/{id}** — Edita un ingrediente
 
 **JSON de ejemplo:**
 ```json
 {
   "nombre": "Tomate Cherry"
+  "quantity": "2 unidades"
 }
 ```
 
-- **DELETE /api/Ingredientes/{id}** — Elimina un ingrediente
+- **DELETE /api/Ingredients/{id}** — Elimina un ingrediente
 
 **Respuesta:**  
 `204 No Content`
@@ -323,23 +329,30 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 
 ### Categorías
 
-- **GET /api/Categorias** — Lista todas las categorías
+- **GET /api/Categories** — Lista todas las categorías
 
 **Respuesta:**
 ```json
 [
   {
     "id": 1,
-    "nombre": "Plato Principal"
+    "name": "Postres",
+    "icon": "🍰",
+    "recipes": []
   },
+```
+
+```json
   {
     "id": 2,
-    "nombre": "Ensaladas"
+    "name": "Ensaladas",
+    "icon": "🥗",
+    "recipes": []
   }
 ]
 ```
 
-- **GET /api/Categorias/{id}** — Busca categoría por ID
+- **GET /api/Categories/{id}** — Busca categoría por ID
 
 **Respuesta:**
 ```json
@@ -349,25 +362,34 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 }
 ```
 
-- **POST /api/Categorias** — Crea una categoría
+- **POST /api/Categories** — Crea una categoría
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Postres"
+  "name": "Postres",
+  "icon": "🍰"
 }
 ```
 
-- **PUT /api/Categorias/{id}** — Edita una categoría
+```json
+{
+  "name": "Ensaladas",
+  "icon": "🥗"
+}
+```
+- **PUT /api/Categories/{id}** — Edita una categoría
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Entradas"
+  "id": 1,
+  "name": "Postres",
+  "icon": "🍮"
 }
 ```
 
-- **DELETE /api/Categorias/{id}** — Elimina una categoría
+- **DELETE /api/Categories/{id}** — Elimina una categoría
 
 **Respuesta:**  
 `204 No Content`
