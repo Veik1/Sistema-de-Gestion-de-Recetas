@@ -276,6 +276,10 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
     "id": 1,
     "nombre": "Lechuga"
   },
+]
+```
+```json
+[
   {
     "id": 2,
     "nombre": "Pollo"
@@ -340,9 +344,11 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
     "icon": "🍰",
     "recipes": []
   },
+]
 ```
 
 ```json
+[
   {
     "id": 2,
     "name": "Ensaladas",
