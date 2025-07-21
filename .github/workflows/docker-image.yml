@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout source code
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
@@ -25,18 +25,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./src/RecipeProject.Api
-          file: ./src/RecipeProject.Api/Dockerfile
+          context: .
+          file: src/RecipeProject.Api/Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/sistema-gestion-recetas:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/sistema-gestion-recetas:${{ github.sha }}
-          build-args: |
-            JWT_KEY=${{ secrets.JWT_KEY }}
-            JWT_ISSUER=${{ secrets.JWT_ISSUER }}
-            JWT_AUDIENCE=${{ secrets.JWT_AUDIENCE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sistema-gestion-recetas:latest
+
+      - name: Clean up
+        run: docker system prune -af

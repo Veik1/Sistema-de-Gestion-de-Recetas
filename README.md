@@ -1,6 +1,22 @@
 # Sistema de Gestión de Recetas
 
-Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administración de recetas culinarias. Permite crear, editar, listar y eliminar recetas, ingredientes y categorías, además de consultar información detallada de cada receta.
+Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administración de recetas culinarias. Permite crear, editar, listar y eliminar recetas, ingredientes y categorías, además de administrar usuarios y autenticación (si está habilitada).
+
+---
+
+## Tabla de contenido
+
+- [Características principales](#características-principales)
+- [Requisitos previos](#requisitos-previos)
+- [Configuración inicial](#configuración-inicial)
+- [Migraciones de la base de datos](#migraciones-de-la-base-de-datos)
+- [Ejecución con Docker](#ejecución-con-docker)
+- [Pruebas y uso con Swagger](#pruebas-y-uso-con-swagger)
+- [Endpoints principales](#endpoints-principales)
+- [Desarrollo](#desarrollo)
+- [FAQ](#faq)
+- [Licencia](#licencia)
+- [Créditos](#créditos)
 
 ---
 
@@ -8,7 +24,8 @@ Proyecto personal desarrollado en C# (.NET), orientado a la gestión y administr
 
 - CRUD completo de recetas, ingredientes y categorías.
 - API RESTful basada en ASP.NET Core.
-- Autenticación (si aplica).
+- Autenticación JWT (opcional, configurable desde `appsettings.json` y `appsettings.Development.json`).  
+  > Si no configuras la sección `Jwt`, la autenticación estará deshabilitada.
 - Documentación automática con Swagger.
 - Despliegue sencillo usando Docker.
 - Migraciones de base de datos con Entity Framework Core.
@@ -70,27 +87,16 @@ Este proyecto utiliza **Entity Framework Core** para el manejo de migraciones.
 
 ### 1. Crear una migración nueva
 
-Ejecuta el siguiente comando desde la raíz del repositorio para crear una nueva migración (ejemplo: “Inicial”):
-
 ```bash
-dotnet ef migrations add Inicial \
-  --project src/RecipeProject.Infrastructure \
-  --startup-project src/RecipeProject.Api
+dotnet ef migrations add Inicial --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
 
-### 2. Aplicar las migraciones a la base de datos
-
-Ejecuta el siguiente comando para aplicar las migraciones y crear la base de datos:
+### 2. Aplicar las migraciones a la base de datos 
+> (Requiere de realizar el paso de ejecución con docker)
 
 ```bash
-dotnet ef database update \
-  --project src/RecipeProject.Infrastructure \
-  --startup-project src/RecipeProject.Api
+dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
-
-> **Tambien veremos como aplicar las migraciones desde docker en el paso siguente**
-
----
 
 **Notas:**
 - Repite el paso 1 cada vez que cambies el modelo de datos.
@@ -104,18 +110,23 @@ dotnet ef database update \
 ### 1. Build & Run
 
 ```bash
-docker build -t recetas-app .
-docker run -d -p 8080:80 --name recetas-app recetas-app
+docker-compose up --build -d
 ```
-
 > Cambia el puerto si lo necesitas.
+
+### 1.1. Si solo se necesita levantar la API
+
+```bash
+docker build -t sistema-de-gestion-de-recetas-api .
+docker run -p 5000:80 sistema-de-gestion-de-recetas-api
+```
 
 ### 2. Variables de entorno en Docker
 
 Puedes pasar variables de conexión usando `-e` en el `docker run`:
 
 ```bash
-docker run -d -p 8080:80 --name recetas-app \
+docker run -d -p 8080:80 --name sistema-de-gestion-de-recetas-api \
     -e ConnectionStrings__DefaultConnection="Server=db;Database=RecetasDb;User Id=sa;Password=YourStrong!Passw0rd;" \
     recetas-app
 ```
@@ -125,12 +136,9 @@ docker run -d -p 8080:80 --name recetas-app \
 Si tienes el entorno corriendo en Docker y el contenedor tiene las herramientas de EF Core instaladas, ejecuta:
 
 ```bash
-docker exec -it recetas-app dotnet ef database update \
-  --project src/RecipeProject.Infrastructure \
-  --startup-project src/RecipeProject.Api
+docker exec -it sistema-de-gestion-de-recetas-api dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
-
-> **Si le pusiste otro nombre al container, o dejaste el default, cambiar recetas-app por el nombre correspondiente**
+> **Si el container tiene otro nombre, cambiar "sistema-de-gestion-de-recetas-api" por el nombre correspondiente**
 
 ---
 
@@ -144,110 +152,161 @@ http://localhost:8080/swagger
 
 ---
 
-## Endpoints principales y ejemplos JSON para Swagger
+## Endpoints principales
+
+A continuación se muestran ejemplos de los principales endpoints expuestos por la API y ejemplos de JSON para Swagger.
 
 ### Recetas
 
-- **GET /api/Recetas** — Lista todas las recetas
+- **GET /api/Recipes** — Lista todas las recetas
 
 **Respuesta:**
 ```json
+
 [
   {
     "id": 1,
-    "nombre": "Ensalada César",
-    "descripcion": "Clásica ensalada con pollo y crutones.",
-    "ingredientes": [
+    "title": "Ensalada César",
+    "instructions": "Clásica ensalada con pollo y crutones.",
+    "imageUrl": "https://ejemplo.com/ensalada.jpg",
+    "isGeneratedByAI": false,
+    "creationDate": "2025-07-21T17:21:27.371921Z",
+    "userId": 1,
+    "ingredients": [
       {
-        "id": 1,
-        "nombre": "Lechuga",
-        "cantidad": "1 unidad"
+        "id": 3,
+        "name": "Lechuga",
+        "quantity": "1 unidad"
       },
       {
-        "id": 2,
-        "nombre": "Pollo",
-        "cantidad": "200g"
+        "id": 4,
+        "name": "Pollo",
+        "quantity": "200g"
       }
     ],
-    "categoria": {
-      "id": 2,
-      "nombre": "Ensaladas"
-    }
+    "categories": []
+  },
+  {
+    "id": 2,
+    "title": "Sopa de Tomate",
+    "instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
+    "imageUrl": "https://ejemplo.com/sopa-tomate.jpg",
+    "isGeneratedByAI": false,
+    "creationDate": "2025-07-21T17:28:44.921708Z",
+    "userId": 1,
+    "ingredients": [
+      {
+        "id": 8,
+        "name": "Tomate",
+        "quantity": "4 unidades"
+      },
+      {
+        "id": 9,
+        "name": "Cebolla",
+        "quantity": "1 unidad"
+      },
+      {
+        "id": 10,
+        "name": "Ajo",
+        "quantity": "2 dientes"
+      },
+      {
+        "id": 11,
+        "name": "Agua",
+        "quantity": "500ml"
+      }
+    ],
+    "categories": []
   }
 ]
 ```
 
-- **GET /api/Recetas/{id}** — Busca receta por ID
+- **GET /api/Recipes/{id}** — Busca receta por ID
 
 **Respuesta:**
 ```json
+
 {
   "id": 1,
-  "nombre": "Ensalada César",
-  "descripcion": "Clásica ensalada con pollo y crutones.",
-  "ingredientes": [
+  "title": "Ensalada César",
+  "instructions": "Clásica ensalada con pollo y crutones.",
+  "imageUrl": "https://ejemplo.com/ensalada.jpg",
+  "isGeneratedByAI": false,
+  "creationDate": "2025-07-21T17:21:27.371921Z",
+  "userId": 1,
+  "ingredients": [
     {
-      "id": 1,
-      "nombre": "Lechuga",
-      "cantidad": "1 unidad"
+      "id": 3,
+      "name": "Lechuga",
+      "quantity": "1 unidad"
     },
     {
-      "id": 2,
-      "nombre": "Pollo",
-      "cantidad": "200g"
+      "id": 4,
+      "name": "Pollo",
+      "quantity": "200g"
     }
   ],
-  "categoria": {
-    "id": 2,
-    "nombre": "Ensaladas"
-  }
+  "categories": []
 }
+
 ```
 
-- **POST /api/Recetas** — Crea una receta
+- **POST /api/Recipes** — Crea una receta
 
 **JSON de ejemplo:**
 ```json
+
 {
-  "nombre": "Ensalada César",
-  "descripcion": "Clásica ensalada con pollo y crutones.",
-  "ingredientes": [
-    {
-      "nombre": "Lechuga",
-      "cantidad": "1 unidad"
-    },
-    {
-      "nombre": "Pollo",
-      "cantidad": "200g"
-    }
-  ],
-  "categoriaId": 2
+  "title": "Ensalada César",
+  "instructions": "Clásica ensalada con pollo y crutones.",
+  "imageUrl": "https://ejemplo.com/ensalada.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "ingredients": [
+    { "name": "Lechuga", "quantity": "1 unidad" },
+    { "name": "Pollo", "quantity": "200g" }
+  ]
 }
+
 ```
 
-- **PUT /api/Recetas/{id}** — Edita una receta
+```json
+
+{
+  "title": "Sopa de Tomate",
+  "instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
+  "imageUrl": "https://ejemplo.com/sopa-tomate.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "ingredients": [
+    { "name": "Tomate", "quantity": "4 unidades" },
+    { "name": "Cebolla", "quantity": "1 unidad" },
+    { "name": "Ajo", "quantity": "2 dientes" },
+    { "name": "Agua", "quantity": "500ml" }
+  ]
+}
+
+```
+
+- **PUT /api/Recipes/{id}** — Edita una receta
 
 **JSON de ejemplo:**
 ```json
+
 {
-  "nombre": "Ensalada César Deluxe",
-  "descripcion": "Ensalada César con extra pollo.",
-  "ingredientes": [
-    {
-      "nombre": "Lechuga",
-      "cantidad": "1 unidad"
-    },
-    {
-      "nombre": "Pollo",
-      "cantidad": "300g"
-    },
-    {
-      "nombre": "Crutones",
-      "cantidad": "50g"
-    }
-  ],
-  "categoriaId": 2
+  "id": 1,
+  "title": "Ensalada César Clásica",
+  "instructions": "Mezcla la lechuga con pollo, crutones y aderezo César.",
+  "imageUrl": "https://ejemplo.com/ensalada-cesar-clasica.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "ingredients": [
+    { "name": "Lechuga", "quantity": "1 unidad" },
+    { "name": "Pollo", "quantity": "250g" },
+    { "name": "Crutones", "quantity": "50g" }
+  ]
 }
+
 ```
 
 - **DELETE /api/Recetas/{id}** — Elimina una receta
@@ -259,23 +318,70 @@ http://localhost:8080/swagger
 
 ### Ingredientes
 
-- **GET /api/Ingredientes** — Lista todos los ingredientes
+- **GET /api/Ingredients** — Lista todos los ingredientes
 
 **Respuesta:**
 ```json
 [
   {
     "id": 1,
-    "nombre": "Lechuga"
+    "name": "Lechuga",
+    "quantity": "1 unidad"
   },
   {
     "id": 2,
-    "nombre": "Pollo"
+    "name": "Pollo",
+    "quantity": "200g"
+  },
+  {
+    "id": 3,
+    "name": "Lechuga",
+    "quantity": "1 unidad"
+  },
+  {
+    "id": 4,
+    "name": "Pollo",
+    "quantity": "200g"
+  },
+  {
+    "id": 5,
+    "name": "Tomate",
+    "quantity": "2 unidades"
+  },
+  {
+    "id": 6,
+    "name": "Queso rallado",
+    "quantity": "50g"
+  },
+  {
+    "id": 7,
+    "name": "Aceite de oliva",
+    "quantity": "2 cucharadas"
+  },
+  {
+    "id": 8,
+    "name": "Tomate",
+    "quantity": "4 unidades"
+  },
+  {
+    "id": 9,
+    "name": "Cebolla",
+    "quantity": "1 unidad"
+  },
+  {
+    "id": 10,
+    "name": "Ajo",
+    "quantity": "2 dientes"
+  },
+  {
+    "id": 11,
+    "name": "Agua",
+    "quantity": "500ml"
   }
 ]
 ```
 
-- **GET /api/Ingredientes/{id}** — Busca ingrediente por ID
+- **GET /api/Ingredients/{id}** — Busca ingrediente por ID
 
 **Respuesta:**
 ```json
@@ -285,25 +391,55 @@ http://localhost:8080/swagger
 }
 ```
 
-- **POST /api/Ingredientes** — Crea un ingrediente
+- **POST /api/Ingredients** — Crea un ingrediente
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Tomate"
+  "name": "Lechuga",
+  "quantity": "1 unidad"
 }
 ```
 
-- **PUT /api/Ingredientes/{id}** — Edita un ingrediente
+```json
+{
+  "name": "Pollo",
+  "quantity": "200g"
+}
+```
+
+```json
+{
+  "name": "Tomate",
+  "quantity": "2 unidades"
+}
+```
+
+```json
+{
+  "name": "Queso rallado",
+  "quantity": "50g"
+}
+```
+
+```json
+{
+  "name": "Aceite de oliva",
+  "quantity": "2 cucharadas"
+}  
+```
+
+- **PUT /api/Ingredients/{id}** — Edita un ingrediente
 
 **JSON de ejemplo:**
 ```json
 {
   "nombre": "Tomate Cherry"
+  "quantity": "2 unidades"
 }
 ```
 
-- **DELETE /api/Ingredientes/{id}** — Elimina un ingrediente
+- **DELETE /api/Ingredients/{id}** — Elimina un ingrediente
 
 **Respuesta:**  
 `204 No Content`
@@ -312,23 +448,35 @@ http://localhost:8080/swagger
 
 ### Categorías
 
-- **GET /api/Categorias** — Lista todas las categorías
+- **GET /api/Categories** — Lista todas las categorías
 
 **Respuesta:**
 ```json
 [
   {
     "id": 1,
-    "nombre": "Plato Principal"
+    "name": "Postres",
+    "icon": "🍰"
   },
   {
     "id": 2,
-    "nombre": "Ensaladas"
+    "name": "Ensaladas",
+    "icon": "🥗"
+  },
+  {
+    "id": 3,
+    "name": "Bebidas",
+    "icon": "🥤"
+  },
+  {
+    "id": 4,
+    "name": "Sopas",
+    "icon": "🍲"
   }
 ]
 ```
 
-- **GET /api/Categorias/{id}** — Busca categoría por ID
+- **GET /api/Categories/{id}** — Busca categoría por ID
 
 **Respuesta:**
 ```json
@@ -338,32 +486,56 @@ http://localhost:8080/swagger
 }
 ```
 
-- **POST /api/Categorias** — Crea una categoría
+- **POST /api/Categories** — Crea una categoría
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Postres"
+  "name": "Postres",
+  "icon": "🍰"
 }
 ```
 
-- **PUT /api/Categorias/{id}** — Edita una categoría
+```json
+{
+  "name": "Ensaladas",
+  "icon": "🥗"
+}
+```
+
+```json
+{
+  "name": "Bebidas",
+  "icon": "🥤"
+}
+```
+
+```json
+{
+  "name": "Sopas",
+  "icon": "🍲"
+}
+```
+
+- **PUT /api/Categories/{id}** — Edita una categoría
 
 **JSON de ejemplo:**
 ```json
 {
-  "nombre": "Entradas"
+  "id": 1,
+  "name": "Postres",
+  "icon": "🍮"
 }
 ```
 
-- **DELETE /api/Categorias/{id}** — Elimina una categoría
+- **DELETE /api/Categories/{id}** — Elimina una categoría
 
 **Respuesta:**  
 `204 No Content`
 
 ---
 
-> En Swagger puedes probar todos los endpoints, enviar peticiones y ver ejemplos de JSON de entrada/salida.
+> Puedes probar todos los endpoints y ejemplos directamente desde Swagger.
 
 ---
 
@@ -379,10 +551,8 @@ http://localhost:8080/swagger
 
 - **¿Puedo usar otra base de datos?**  
   Sí, solo cambia la cadena de conexión y el proveedor de EF Core.
-
 - **¿Cómo agrego una migración desde Docker?**  
   Usa `docker exec` como se mostró arriba.
-
 - **¿Dónde veo la documentación de la API?**  
   En `/swagger` después de levantar el contenedor.
 
