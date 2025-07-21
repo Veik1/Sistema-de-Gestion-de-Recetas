@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
 using RecipeProject.Application.UseCases;
 using RecipeProject.Domain.Entities;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
 using System;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
@@ -15,26 +18,35 @@ namespace RecipeProject.Api.Controllers
         private readonly IRecipeRepository _recipeRepository;
         private readonly CreateRecipeUseCase _createRecipeUseCase;
         private readonly UpdateRecipeUseCase _updateRecipeUseCase;
+        private readonly IMapper _mapper;
 
         public RecipesController(
             IRecipeRepository recipeRepository,
             CreateRecipeUseCase createRecipeUseCase,
-            UpdateRecipeUseCase updateRecipeUseCase)
+            UpdateRecipeUseCase updateRecipeUseCase,
+            IMapper mapper)
         {
             _recipeRepository = recipeRepository;
             _createRecipeUseCase = createRecipeUseCase;
             _updateRecipeUseCase = updateRecipeUseCase;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_recipeRepository.GetAll());
+        public IActionResult GetAll()
+        {
+            var recipes = _recipeRepository.GetAll();
+            var dtos = _mapper.Map<IEnumerable<RecipeDto>>(recipes);
+            return Ok(dtos);
+        }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var recipe = _recipeRepository.GetById(id);
             if (recipe == null) return NotFound();
-            return Ok(recipe);
+            var dto = _mapper.Map<RecipeDto>(recipe);
+            return Ok(dto);
         }
 
         [HttpPost]
@@ -43,7 +55,8 @@ namespace RecipeProject.Api.Controllers
             try
             {
                 _createRecipeUseCase.Execute(recipe);
-                return CreatedAtAction(nameof(GetById), new { id = recipe.Id }, recipe);
+                var dto = _mapper.Map<RecipeDto>(recipe);
+                return CreatedAtAction(nameof(GetById), new { id = recipe.Id }, dto);
             }
             catch (ArgumentException ex)
             {

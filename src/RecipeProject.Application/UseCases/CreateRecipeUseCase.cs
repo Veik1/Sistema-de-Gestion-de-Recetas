@@ -17,12 +17,10 @@ namespace RecipeProject.Application.UseCases
 
         public void Execute(Recipe recipe)
         {
-
             if (string.IsNullOrWhiteSpace(recipe.Title))
                 throw new ArgumentException("Title is required.");
             if (string.IsNullOrWhiteSpace(recipe.Instructions))
                 throw new ArgumentException("Instructions are required.");
-
 
             if (recipe.Ingredients == null || recipe.Ingredients.Count == 0)
                 throw new ArgumentException("At least one ingredient is required.");
@@ -32,6 +30,13 @@ namespace RecipeProject.Application.UseCases
                 throw new ArgumentException("User does not exist.");
 
             recipe.CreationDate = DateTime.UtcNow;
+
+            // Evitar referencias circulares y Recipe requerido en ingredientes
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                ingredient.Recipe = null;
+                // RecipeId se asignará automáticamente por EF Core al guardar la receta
+            }
 
             _recipeRepository.Add(recipe);
         }

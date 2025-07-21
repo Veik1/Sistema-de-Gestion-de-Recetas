@@ -68,9 +68,11 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
+    // XML comments for Swagger (if available)
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath);
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -95,6 +97,9 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(RecipeProject.Application.Mapping.MappingProfile).Assembly);
 
 // Health checks (PostgreSQL)
 builder.Services.AddHealthChecks()

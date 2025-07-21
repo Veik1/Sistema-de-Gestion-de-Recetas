@@ -2,59 +2,51 @@
 using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
 using RecipeProject.Domain.Entities;
-using System;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
-    /// <summary>
-    /// Endpoints for managing comments.
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
     public class CommentsController : ControllerBase
     {
         private readonly ICommentRepository _commentRepository;
+        private readonly IMapper _mapper;
 
-        public CommentsController(ICommentRepository commentRepository)
+        public CommentsController(ICommentRepository commentRepository, IMapper mapper)
         {
             _commentRepository = commentRepository;
+            _mapper = mapper;
         }
 
-        /// <summary>
-        /// Gets all comments.
-        /// </summary>
         [HttpGet]
-        public IActionResult GetAll() => Ok(_commentRepository.GetAll());
+        public IActionResult GetAll()
+        {
+            var comments = _commentRepository.GetAll();
+            var dtos = _mapper.Map<IEnumerable<CommentDto>>(comments);
+            return Ok(dtos);
+        }
 
-        /// <summary>
-        /// Gets a comment by its ID.
-        /// </summary>
-        /// <param name="id">Comment ID.</param>
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var comment = _commentRepository.GetById(id);
             if (comment == null) return NotFound();
-            return Ok(comment);
+            var dto = _mapper.Map<CommentDto>(comment);
+            return Ok(dto);
         }
 
-        /// <summary>
-        /// Creates a new comment.
-        /// </summary>
-        /// <param name="comment">Comment data.</param>
         [HttpPost]
         public IActionResult Create([FromBody] Comment comment)
         {
             _commentRepository.Add(comment);
-            return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment);
+            var dto = _mapper.Map<CommentDto>(comment);
+            return CreatedAtAction(nameof(GetById), new { id = comment.Id }, dto);
         }
 
-        /// <summary>
-        /// Updates an existing comment.
-        /// </summary>
-        /// <param name="id">Comment ID.</param>
-        /// <param name="comment">Comment data.</param>
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] Comment comment)
         {
@@ -63,10 +55,6 @@ namespace RecipeProject.Api.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Deletes a comment by ID.
-        /// </summary>
-        /// <param name="id">Comment ID.</param>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

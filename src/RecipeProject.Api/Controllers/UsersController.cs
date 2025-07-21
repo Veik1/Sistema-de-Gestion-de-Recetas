@@ -2,26 +2,32 @@
 using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
 using RecipeProject.Domain.Entities;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // protected endpoints, access only for auth users
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
             var users = _userRepository.GetAll();
-            return Ok(users);
+            var dtos = _mapper.Map<IEnumerable<UserDto>>(users);
+            return Ok(dtos);
         }
 
         [HttpGet("{id}")]
@@ -29,24 +35,8 @@ namespace RecipeProject.Api.Controllers
         {
             var user = _userRepository.GetById(id);
             if (user == null) return NotFound();
-            return Ok(user);
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] User user)
-        {
-            if (id != user.Id) return BadRequest();
-            _userRepository.Update(user);
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var user = _userRepository.GetById(id);
-            if (user == null) return NotFound();
-            _userRepository.Delete(id);
-            return NoContent();
+            var dto = _mapper.Map<UserDto>(user);
+            return Ok(dto);
         }
     }
 }

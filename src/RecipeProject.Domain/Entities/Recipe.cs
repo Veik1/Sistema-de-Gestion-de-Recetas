@@ -13,7 +13,7 @@ namespace RecipeProject.Domain.Entities
         public DateTime CreationDate { get; set; }
 
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         public List<Ingredient> Ingredients { get; set; } = new();
         public List<Comment> Comments { get; set; } = new();

@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
 using RecipeProject.Domain.Entities;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
 using System;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
@@ -15,18 +18,24 @@ namespace RecipeProject.Api.Controllers
     public class SearchHistoriesController : ControllerBase
     {
         private readonly ISearchHistoryRepository _searchHistoryRepository;
+        private readonly IMapper _mapper;
 
-        public SearchHistoriesController(ISearchHistoryRepository searchHistoryRepository)
+        public SearchHistoriesController(ISearchHistoryRepository searchHistoryRepository, IMapper mapper)
         {
             _searchHistoryRepository = searchHistoryRepository;
+            _mapper = mapper;
         }
-
 
         /// <summary>
         /// Gets all search histories.
         /// </summary>
         [HttpGet]
-        public IActionResult GetAll() => Ok(_searchHistoryRepository.GetAll());
+        public IActionResult GetAll()
+        {
+            var histories = _searchHistoryRepository.GetAll();
+            var dtos = _mapper.Map<IEnumerable<SearchHistoryDto>>(histories);
+            return Ok(dtos);
+        }
 
         /// <summary>
         /// Gets a search history by its ID.
@@ -37,7 +46,8 @@ namespace RecipeProject.Api.Controllers
         {
             var history = _searchHistoryRepository.GetById(id);
             if (history == null) return NotFound();
-            return Ok(history);
+            var dto = _mapper.Map<SearchHistoryDto>(history);
+            return Ok(dto);
         }
 
         /// <summary>
@@ -48,7 +58,8 @@ namespace RecipeProject.Api.Controllers
         public IActionResult Create([FromBody] SearchHistory history)
         {
             _searchHistoryRepository.Add(history);
-            return CreatedAtAction(nameof(GetById), new { id = history.Id }, history);
+            var dto = _mapper.Map<SearchHistoryDto>(history);
+            return CreatedAtAction(nameof(GetById), new { id = history.Id }, dto);
         }
 
         /// <summary>

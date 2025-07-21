@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
 using RecipeProject.Domain.Entities;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
@@ -16,10 +19,12 @@ namespace RecipeProject.Api.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly IReportRepository _reportRepository;
+        private readonly IMapper _mapper;
 
-        public ReportsController(IReportRepository reportRepository)
+        public ReportsController(IReportRepository reportRepository, IMapper mapper)
         {
             _reportRepository = reportRepository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -27,7 +32,12 @@ namespace RecipeProject.Api.Controllers
         /// </summary>
         /// <returns>List of all reports.</returns>
         [HttpGet]
-        public IActionResult GetAll() => Ok(_reportRepository.GetAll());
+        public IActionResult GetAll()
+        {
+            var reports = _reportRepository.GetAll();
+            var dtos = _mapper.Map<IEnumerable<ReportDto>>(reports);
+            return Ok(dtos);
+        }
 
         /// <summary>
         /// Gets a report by its ID.
@@ -39,7 +49,8 @@ namespace RecipeProject.Api.Controllers
         {
             var report = _reportRepository.GetAll().FirstOrDefault(r => r.Id == id);
             if (report == null) return NotFound();
-            return Ok(report);
+            var dto = _mapper.Map<ReportDto>(report);
+            return Ok(dto);
         }
 
         /// <summary>
@@ -51,7 +62,8 @@ namespace RecipeProject.Api.Controllers
         public IActionResult Create([FromBody] Report report)
         {
             _reportRepository.Add(report);
-            return CreatedAtAction(nameof(GetById), new { id = report.Id }, report);
+            var dto = _mapper.Map<ReportDto>(report);
+            return CreatedAtAction(nameof(GetById), new { id = report.Id }, dto);
         }
 
         /// <summary>

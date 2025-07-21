@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
 using RecipeProject.Application.UseCases;
 using RecipeProject.Domain.Entities;
-using System;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
@@ -17,18 +19,28 @@ namespace RecipeProject.Api.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly UpdateCategoryUseCase _updateCategoryUseCase;
+        private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryRepository categoryRepository, UpdateCategoryUseCase updateCategoryUseCase)
+        public CategoriesController(
+            ICategoryRepository categoryRepository,
+            UpdateCategoryUseCase updateCategoryUseCase,
+            IMapper mapper)
         {
             _categoryRepository = categoryRepository;
             _updateCategoryUseCase = updateCategoryUseCase;
+            _mapper = mapper;
         }
 
         /// <summary>
         /// Gets all categories.
         /// </summary>
         [HttpGet]
-        public IActionResult GetAll() => Ok(_categoryRepository.GetAll());
+        public IActionResult GetAll()
+        {
+            var categories = _categoryRepository.GetAll();
+            var dtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
+            return Ok(dtos);
+        }
 
         /// <summary>
         /// Gets a category by its ID.
@@ -39,7 +51,8 @@ namespace RecipeProject.Api.Controllers
         {
             var category = _categoryRepository.GetById(id);
             if (category == null) return NotFound();
-            return Ok(category);
+            var dto = _mapper.Map<CategoryDto>(category);
+            return Ok(dto);
         }
 
         /// <summary>
@@ -50,7 +63,8 @@ namespace RecipeProject.Api.Controllers
         public IActionResult Create([FromBody] Category category)
         {
             _categoryRepository.Add(category);
-            return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
+            var dto = _mapper.Map<CategoryDto>(category);
+            return CreatedAtAction(nameof(GetById), new { id = category.Id }, dto);
         }
 
         /// <summary>

@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using RecipeProject.Application.Interfaces;
-using RecipeProject.Application.UseCases;
 using RecipeProject.Domain.Entities;
-using System;
+using RecipeProject.Application.DTOs;
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace RecipeProject.Api.Controllers
 {
@@ -13,45 +14,37 @@ namespace RecipeProject.Api.Controllers
     public class RatingsController : ControllerBase
     {
         private readonly IRatingRepository _ratingRepository;
-        private readonly CreateRatingUseCase _createRatingUseCase;
+        private readonly IMapper _mapper;
 
-        public RatingsController(IRatingRepository ratingRepository, CreateRatingUseCase createRatingUseCase)
+        public RatingsController(IRatingRepository ratingRepository, IMapper mapper)
         {
             _ratingRepository = ratingRepository;
-            _createRatingUseCase = createRatingUseCase;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_ratingRepository.GetAll());
+        public IActionResult GetAll()
+        {
+            var ratings = _ratingRepository.GetAll();
+            var dtos = _mapper.Map<IEnumerable<RatingDto>>(ratings);
+            return Ok(dtos);
+        }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var rating = _ratingRepository.GetById(id);
             if (rating == null) return NotFound();
-            return Ok(rating);
+            var dto = _mapper.Map<RatingDto>(rating);
+            return Ok(dto);
         }
 
         [HttpPost]
         public IActionResult Create([FromBody] Rating rating)
         {
-            try
-            {
-                _createRatingUseCase.Execute(rating);
-                return CreatedAtAction(nameof(GetById), new { id = rating.Id }, rating);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An unexpected error occurred.");
-            }
+            _ratingRepository.Add(rating);
+            var dto = _mapper.Map<RatingDto>(rating);
+            return CreatedAtAction(nameof(GetById), new { id = rating.Id }, dto);
         }
 
         [HttpPut("{id}")]
