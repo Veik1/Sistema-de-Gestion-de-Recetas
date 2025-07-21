@@ -163,8 +163,62 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 **Respuesta:**
 ```json
 
-FALTA AGREGAR DATOS
-
+[
+  {
+    "id": 1,
+    "title": "Ensalada César",
+    "instructions": "Clásica ensalada con pollo y crutones.",
+    "imageUrl": "https://ejemplo.com/ensalada.jpg",
+    "isGeneratedByAI": false,
+    "creationDate": "2025-07-21T17:21:27.371921Z",
+    "userId": 1,
+    "ingredients": [
+      {
+        "id": 3,
+        "name": "Lechuga",
+        "quantity": "1 unidad"
+      },
+      {
+        "id": 4,
+        "name": "Pollo",
+        "quantity": "200g"
+      }
+    ],
+    "categories": []
+  },
+  {
+    "id": 2,
+    "title": "Sopa de Tomate",
+    "instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
+    "imageUrl": "https://ejemplo.com/sopa-tomate.jpg",
+    "isGeneratedByAI": false,
+    "creationDate": "2025-07-21T17:28:44.921708Z",
+    "userId": 1,
+    "ingredients": [
+      {
+        "id": 8,
+        "name": "Tomate",
+        "quantity": "4 unidades"
+      },
+      {
+        "id": 9,
+        "name": "Cebolla",
+        "quantity": "1 unidad"
+      },
+      {
+        "id": 10,
+        "name": "Ajo",
+        "quantity": "2 dientes"
+      },
+      {
+        "id": 11,
+        "name": "Agua",
+        "quantity": "500ml"
+      }
+    ],
+    "categories": []
+  }
+]
 ```
 
 - **GET /api/Recipes/{id}** — Busca receta por ID
@@ -172,7 +226,28 @@ FALTA AGREGAR DATOS
 **Respuesta:**
 ```json
 
-FALTA AGREGAR DATOS
+{
+  "id": 1,
+  "title": "Ensalada César",
+  "instructions": "Clásica ensalada con pollo y crutones.",
+  "imageUrl": "https://ejemplo.com/ensalada.jpg",
+  "isGeneratedByAI": false,
+  "creationDate": "2025-07-21T17:21:27.371921Z",
+  "userId": 1,
+  "ingredients": [
+    {
+      "id": 3,
+      "name": "Lechuga",
+      "quantity": "1 unidad"
+    },
+    {
+      "id": 4,
+      "name": "Pollo",
+      "quantity": "200g"
+    }
+  ],
+  "categories": []
+}
 
 ```
 
@@ -195,12 +270,42 @@ FALTA AGREGAR DATOS
 
 ```
 
+```json
+
+{
+  "title": "Sopa de Tomate",
+  "instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
+  "imageUrl": "https://ejemplo.com/sopa-tomate.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "ingredients": [
+    { "name": "Tomate", "quantity": "4 unidades" },
+    { "name": "Cebolla", "quantity": "1 unidad" },
+    { "name": "Ajo", "quantity": "2 dientes" },
+    { "name": "Agua", "quantity": "500ml" }
+  ]
+}
+
+```
+
 - **PUT /api/Recipes/{id}** — Edita una receta
 
 **JSON de ejemplo:**
 ```json
 
-FALTA AGREGAR DATOS
+{
+  "id": 1,
+  "title": "Ensalada César Clásica",
+  "instructions": "Mezcla la lechuga con pollo, crutones y aderezo César.",
+  "imageUrl": "https://ejemplo.com/ensalada-cesar-clasica.jpg",
+  "isGeneratedByAI": false,
+  "userId": 1,
+  "ingredients": [
+    { "name": "Lechuga", "quantity": "1 unidad" },
+    { "name": "Pollo", "quantity": "250g" },
+    { "name": "Crutones", "quantity": "50g" }
+  ]
+}
 
 ```
 
@@ -220,11 +325,58 @@ FALTA AGREGAR DATOS
 [
   {
     "id": 1,
-    "nombre": "Lechuga"
+    "name": "Lechuga",
+    "quantity": "1 unidad"
   },
   {
     "id": 2,
-    "nombre": "Pollo"
+    "name": "Pollo",
+    "quantity": "200g"
+  },
+  {
+    "id": 3,
+    "name": "Lechuga",
+    "quantity": "1 unidad"
+  },
+  {
+    "id": 4,
+    "name": "Pollo",
+    "quantity": "200g"
+  },
+  {
+    "id": 5,
+    "name": "Tomate",
+    "quantity": "2 unidades"
+  },
+  {
+    "id": 6,
+    "name": "Queso rallado",
+    "quantity": "50g"
+  },
+  {
+    "id": 7,
+    "name": "Aceite de oliva",
+    "quantity": "2 cucharadas"
+  },
+  {
+    "id": 8,
+    "name": "Tomate",
+    "quantity": "4 unidades"
+  },
+  {
+    "id": 9,
+    "name": "Cebolla",
+    "quantity": "1 unidad"
+  },
+  {
+    "id": 10,
+    "name": "Ajo",
+    "quantity": "2 dientes"
+  },
+  {
+    "id": 11,
+    "name": "Agua",
+    "quantity": "500ml"
   }
 ]
 ```
@@ -256,6 +408,27 @@ FALTA AGREGAR DATOS
 }
 ```
 
+```json
+{
+  "name": "Tomate",
+  "quantity": "2 unidades"
+}
+```
+
+```json
+{
+  "name": "Queso rallado",
+  "quantity": "50g"
+}
+```
+
+```json
+{
+  "name": "Aceite de oliva",
+  "quantity": "2 cucharadas"
+}  
+```
+
 - **PUT /api/Ingredients/{id}** — Edita un ingrediente
 
 **JSON de ejemplo:**
@@ -283,19 +456,22 @@ FALTA AGREGAR DATOS
   {
     "id": 1,
     "name": "Postres",
-    "icon": "🍰",
-    "recipes": []
+    "icon": "🍰"
   },
-]
-```
-
-```json
-[
   {
     "id": 2,
     "name": "Ensaladas",
-    "icon": "🥗",
-    "recipes": []
+    "icon": "🥗"
+  },
+  {
+    "id": 3,
+    "name": "Bebidas",
+    "icon": "🥤"
+  },
+  {
+    "id": 4,
+    "name": "Sopas",
+    "icon": "🍲"
   }
 ]
 ```
@@ -326,6 +502,21 @@ FALTA AGREGAR DATOS
   "icon": "🥗"
 }
 ```
+
+```json
+{
+  "name": "Bebidas",
+  "icon": "🥤"
+}
+```
+
+```json
+{
+  "name": "Sopas",
+  "icon": "🍲"
+}
+```
+
 - **PUT /api/Categories/{id}** — Edita una categoría
 
 **JSON de ejemplo:**
