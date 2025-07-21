@@ -91,13 +91,12 @@ Este proyecto utiliza **Entity Framework Core** para el manejo de migraciones.
 dotnet ef migrations add Inicial --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
 
-### 2. Aplicar las migraciones a la base de datos
+### 2. Aplicar las migraciones a la base de datos 
+> (Requiere de realizar el paso de ejecución con docker)
 
 ```bash
 dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
-
-> **También puedes aplicar las migraciones desde Docker en el paso siguiente**
 
 **Notas:**
 - Repite el paso 1 cada vez que cambies el modelo de datos.
@@ -111,17 +110,23 @@ dotnet ef database update --project src/RecipeProject.Infrastructure --startup-p
 ### 1. Build & Run
 
 ```bash
-docker build -t recetas-app .
-docker run -d -p 8080:80 --name recetas-app recetas-app
+docker-compose up --build -d
 ```
 > Cambia el puerto si lo necesitas.
+
+### 1.1. Si solo se necesita levantar la API
+
+```bash
+docker build -t sistema-de-gestion-de-recetas-api .
+docker run -p 5000:80 sistema-de-gestion-de-recetas-api
+```
 
 ### 2. Variables de entorno en Docker
 
 Puedes pasar variables de conexión usando `-e` en el `docker run`:
 
 ```bash
-docker run -d -p 8080:80 --name recetas-app \
+docker run -d -p 8080:80 --name sistema-de-gestion-de-recetas-api \
     -e ConnectionStrings__DefaultConnection="Server=db;Database=RecetasDb;User Id=sa;Password=YourStrong!Passw0rd;" \
     recetas-app
 ```
@@ -131,9 +136,9 @@ docker run -d -p 8080:80 --name recetas-app \
 Si tienes el entorno corriendo en Docker y el contenedor tiene las herramientas de EF Core instaladas, ejecuta:
 
 ```bash
-docker exec -it recetas-app dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
+docker exec -it sistema-de-gestion-de-recetas-api dotnet ef database update --project src/RecipeProject.Infrastructure --startup-project src/RecipeProject.Api
 ```
-> **Si le pusiste otro nombre al container, o dejaste el default, cambiar recetas-app por el nombre correspondiente**
+> **Si el container tiene otro nombre, cambiar "sistema-de-gestion-de-recetas-api" por el nombre correspondiente**
 
 ---
 
