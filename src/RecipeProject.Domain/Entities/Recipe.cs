@@ -16,6 +16,7 @@ namespace RecipeProject.Domain.Entities
         public User? User { get; set; }
 
         public List<Ingredient> Ingredients { get; set; } = new();
+        public List<RecipeIngredient> RecipeIngredients { get; set; }
         public List<Comment> Comments { get; set; } = new();
         public List<Rating> Ratings { get; set; } = new();
         public List<Category> Categories { get; set; } = new();

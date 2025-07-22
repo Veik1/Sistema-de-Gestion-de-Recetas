@@ -15,6 +15,7 @@ namespace RecipeProject.Infrastructure.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<SearchHistory> SearchHistories { get; set; }
+        public DbSet<RecipeIngredient> RecipeIngredients { get; set; } // <-- Agregado
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,7 +49,21 @@ namespace RecipeProject.Infrastructure.Data
                 .HasMany(r => r.Categories)
                 .WithMany(c => c.Recipes);
 
-            // Recipe -> Ingredients (uno a muchos)
+            // Recipe <-> Ingredient (muchos a muchos con entidad intermedia)
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasKey(ri => new { ri.RecipeId, ri.IngredientId }); // Clave primaria compuesta
+
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasOne(ri => ri.Recipe)
+                .WithMany(r => r.RecipeIngredients)
+                .HasForeignKey(ri => ri.RecipeId);
+
+            modelBuilder.Entity<RecipeIngredient>()
+                .HasOne(ri => ri.Ingredient)
+                .WithMany(i => i.RecipeIngredients)
+                .HasForeignKey(ri => ri.IngredientId);
+
+            // Recipe -> Ingredients (uno a muchos, si sigues usando Recipe.Ingredients)
             modelBuilder.Entity<Ingredient>()
                 .HasOne(i => i.Recipe)
                 .WithMany(r => r.Ingredients)

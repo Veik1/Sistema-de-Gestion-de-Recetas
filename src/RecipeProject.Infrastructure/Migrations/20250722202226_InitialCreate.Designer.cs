@@ -12,8 +12,8 @@ using RecipeProject.Infrastructure.Data;
 namespace RecipeProject.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250718134534_MakeUserNullableInRecipe")]
-    partial class MakeUserNullableInRecipe
+    [Migration("20250722202226_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -184,6 +184,25 @@ namespace RecipeProject.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Recipes");
+                });
+
+            modelBuilder.Entity("RecipeProject.Domain.Entities.RecipeIngredient", b =>
+                {
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IngredientId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Quantity")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("RecipeId", "IngredientId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("RecipeIngredients");
                 });
 
             modelBuilder.Entity("RecipeProject.Domain.Entities.Report", b =>
@@ -366,6 +385,25 @@ namespace RecipeProject.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("RecipeProject.Domain.Entities.RecipeIngredient", b =>
+                {
+                    b.HasOne("RecipeProject.Domain.Entities.Ingredient", "Ingredient")
+                        .WithMany("RecipeIngredients")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RecipeProject.Domain.Entities.Recipe", "Recipe")
+                        .WithMany("RecipeIngredients")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("Recipe");
+                });
+
             modelBuilder.Entity("RecipeProject.Domain.Entities.Report", b =>
                 {
                     b.HasOne("RecipeProject.Domain.Entities.Comment", "Comment")
@@ -416,6 +454,11 @@ namespace RecipeProject.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RecipeProject.Domain.Entities.Ingredient", b =>
+                {
+                    b.Navigation("RecipeIngredients");
+                });
+
             modelBuilder.Entity("RecipeProject.Domain.Entities.Recipe", b =>
                 {
                     b.Navigation("Comments");
@@ -423,6 +466,8 @@ namespace RecipeProject.Infrastructure.Migrations
                     b.Navigation("Ingredients");
 
                     b.Navigation("Ratings");
+
+                    b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("RecipeProject.Domain.Entities.User", b =>

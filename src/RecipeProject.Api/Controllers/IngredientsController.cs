@@ -4,15 +4,11 @@ using RecipeProject.Application.Interfaces;
 using RecipeProject.Application.UseCases;
 using RecipeProject.Domain.Entities;
 using RecipeProject.Application.DTOs;
-using AutoMapper;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RecipeProject.Api.Controllers
 {
-    /// <summary>
-    /// Endpoints for managing ingredients.
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -20,76 +16,85 @@ namespace RecipeProject.Api.Controllers
     {
         private readonly IIngredientRepository _ingredientRepository;
         private readonly UpdateIngredientUseCase _updateIngredientUseCase;
-        private readonly IMapper _mapper;
 
         public IngredientsController(
             IIngredientRepository ingredientRepository,
-            UpdateIngredientUseCase updateIngredientUseCase,
-            IMapper mapper)
+            UpdateIngredientUseCase updateIngredientUseCase)
         {
             _ingredientRepository = ingredientRepository;
             _updateIngredientUseCase = updateIngredientUseCase;
-            _mapper = mapper;
         }
 
-        /// <summary>
-        /// Gets all ingredients.
-        /// </summary>
         [HttpGet]
         public IActionResult GetAll()
         {
             var ingredients = _ingredientRepository.GetAll();
-            var dtos = _mapper.Map<IEnumerable<IngredientDto>>(ingredients);
+            var dtos = ingredients.Select(MapIngredientToDto).ToList();
             return Ok(dtos);
         }
 
-        /// <summary>
-        /// Gets an ingredient by its ID.
-        /// </summary>
-        /// <param name="id">Ingredient ID.</param>
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var ingredient = _ingredientRepository.GetById(id);
             if (ingredient == null) return NotFound();
-            var dto = _mapper.Map<IngredientDto>(ingredient);
+            var dto = MapIngredientToDto(ingredient);
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Creates a new ingredient.
-        /// </summary>
-        /// <param name="ingredient">Ingredient data.</param>
-        [HttpPost]
-        public IActionResult Create([FromBody] Ingredient ingredient)
+        [HttpGet("by-recipe/{recipeId}")]
+        public IActionResult GetByRecipeId(int recipeId)
         {
+            var ingredients = _ingredientRepository.GetByRecipeId(recipeId);
+            var dtos = ingredients.Select(MapIngredientToDto).ToList();
+            return Ok(dtos);
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] IngredientDto ingredientDto)
+        {
+            var ingredient = MapDtoToIngredient(ingredientDto);
             _ingredientRepository.Add(ingredient);
-            var dto = _mapper.Map<IngredientDto>(ingredient);
+            var dto = MapIngredientToDto(ingredient);
             return CreatedAtAction(nameof(GetById), new { id = ingredient.Id }, dto);
         }
 
-        /// <summary>
-        /// Updates an existing ingredient.
-        /// </summary>
-        /// <param name="id">Ingredient ID.</param>
-        /// <param name="ingredient">Ingredient data.</param>
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Ingredient ingredient)
+        public IActionResult Update(int id, [FromBody] IngredientDto ingredientDto)
         {
-            if (id != ingredient.Id) return BadRequest();
+            if (id != ingredientDto.Id) return BadRequest();
+            var ingredient = MapDtoToIngredient(ingredientDto);
             _updateIngredientUseCase.Execute(ingredient);
             return NoContent();
         }
 
-        /// <summary>
-        /// Deletes an ingredient by ID.
-        /// </summary>
-        /// <param name="id">Ingredient ID.</param>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             _ingredientRepository.Delete(id);
             return NoContent();
+        }
+
+        // --- Manual mapping methods ---
+
+        private static IngredientDto MapIngredientToDto(Ingredient ingredient)
+        {
+            return new IngredientDto
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                Quantity = ingredient.Quantity
+            };
+        }
+
+        private static Ingredient MapDtoToIngredient(IngredientDto dto)
+        {
+            return new Ingredient
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Quantity = dto.Quantity
+            };
         }
     }
 }

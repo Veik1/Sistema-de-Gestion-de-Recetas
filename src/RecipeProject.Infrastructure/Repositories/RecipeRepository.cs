@@ -19,7 +19,8 @@ namespace RecipeProject.Infrastructure.Repositories
         public IEnumerable<Recipe> GetAll() =>
             _context.Recipes
                 .Include(r => r.Categories)
-                .Include(r => r.Ingredients)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
                 .Include(r => r.Ratings)
                 .Include(r => r.Comments)
                 .ToList();
@@ -27,7 +28,8 @@ namespace RecipeProject.Infrastructure.Repositories
         public Recipe GetById(int id) =>
             _context.Recipes
                 .Include(r => r.Categories)
-                .Include(r => r.Ingredients)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
                 .Include(r => r.Ratings)
                 .Include(r => r.Comments)
                 .FirstOrDefault(r => r.Id == id);
@@ -36,7 +38,8 @@ namespace RecipeProject.Infrastructure.Repositories
             _context.Recipes
                 .Where(r => r.UserId == userId)
                 .Include(r => r.Categories)
-                .Include(r => r.Ingredients)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
                 .Include(r => r.Ratings)
                 .Include(r => r.Comments)
                 .ToList();
@@ -49,7 +52,23 @@ namespace RecipeProject.Infrastructure.Repositories
 
         public void Update(Recipe recipe)
         {
+            // Adjunta la receta
             _context.Recipes.Update(recipe);
+
+            // Adjunta ingredientes existentes
+            foreach (var ri in recipe.RecipeIngredients)
+            {
+                if (ri.IngredientId > 0)
+                    _context.Entry(ri.Ingredient).State = EntityState.Unchanged;
+            }
+
+            // Adjunta categorías existentes
+            foreach (var cat in recipe.Categories)
+            {
+                if (cat.Id > 0)
+                    _context.Entry(cat).State = EntityState.Unchanged;
+            }
+
             _context.SaveChanges();
         }
 

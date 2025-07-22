@@ -15,7 +15,7 @@ namespace RecipeProject.Application.DTOs
         public bool IsGeneratedByAI { get; set; }
         public DateTime CreationDate { get; set; }
         public int UserId { get; set; }
-        public List<IngredientDto> Ingredients { get; set; }
+        public List<RecipeIngredientDto> Ingredients { get; set; }
         public List<CategoryDto> Categories { get; set; }
     }
 }

@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.OpenApi.Models;
+using RecipeProject.Application.Interfaces;
 using RecipeProject.Application.Services;
 using RecipeProject.Application.UseCases;
-using RecipeProject.Application.Interfaces;
-using RecipeProject.Infrastructure.Repositories;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using RecipeProject.Infrastructure.Data;
+using RecipeProject.Infrastructure.Repositories;
+using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +57,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = null; // Esto fuerza PascalCase
+});
 
 // Swagger/OpenAPI + JWT
 builder.Services.AddEndpointsApiExplorer();
@@ -98,13 +102,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(RecipeProject.Application.Mapping.MappingProfile).Assembly);
-
-// Health checks (PostgreSQL)
-builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection"));
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -119,5 +116,4 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHealthChecks("/health");
 app.Run();
