@@ -338,13 +338,13 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
   "userId": 1,
   "ingredients": [
     { "ingredientId": 1, "ingredientName": "Lechuga", "quantity": "1 unidad" },
-    { "ingredientId": 2, "ingredientName": "Pollo", "quantity": "250g" },
-    { "ingredientId": 3, "ingredientName": "Crutones", "quantity": "50g" }
+    { "ingredientId": 2, "ingredientName": "Pollo", "quantity": "250g" }
   ],
   "categories": [
     { "id": 2, "name": "Ensaladas", "icon": "🥗" }
   ]
 }
+
 
 ```
 
