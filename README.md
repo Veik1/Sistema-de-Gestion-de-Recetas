@@ -602,3 +602,5 @@ Este proyecto es de uso personal y educativo. Si deseas contribuir, ¡envía tu 
 ## Créditos
 
 Desarrollado por [Veik1](https://github.com/Veik1).
+
+---
