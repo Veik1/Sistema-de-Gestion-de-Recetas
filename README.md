@@ -165,60 +165,73 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 
 [
   {
-    "id": 1,
-    "title": "Ensalada César",
-    "instructions": "Clásica ensalada con pollo y crutones.",
-    "imageUrl": "https://ejemplo.com/ensalada.jpg",
-    "isGeneratedByAI": false,
-    "creationDate": "2025-07-21T17:21:27.371921Z",
-    "userId": 1,
-    "ingredients": [
+    "Id": 1,
+    "Title": "Ensalada César Clásica",
+    "Instructions": "Mezcla la lechuga con pollo, crutones y aderezo César.",
+    "ImageUrl": "https://ejemplo.com/ensalada-cesar-clasica.jpg",
+    "IsGeneratedByAI": false,
+    "CreationDate": "2025-07-22T19:21:12.01428Z",
+    "UserId": 1,
+    "Ingredients": [
       {
-        "id": 3,
-        "name": "Lechuga",
-        "quantity": "1 unidad"
+        "IngredientId": 1,
+        "IngredientName": "Lechuga",
+        "Quantity": "1 unidad"
       },
       {
-        "id": 4,
-        "name": "Pollo",
-        "quantity": "200g"
+        "IngredientId": 2,
+        "IngredientName": "Pollo",
+        "Quantity": "200g"
       }
     ],
-    "categories": []
+    "Categories": [
+      {
+        "Id": 2,
+        "Name": "Ensaladas",
+        "Icon": "🥗"
+      }
+    ]
   },
   {
-    "id": 2,
-    "title": "Sopa de Tomate",
-    "instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
-    "imageUrl": "https://ejemplo.com/sopa-tomate.jpg",
-    "isGeneratedByAI": false,
-    "creationDate": "2025-07-21T17:28:44.921708Z",
-    "userId": 1,
-    "ingredients": [
+    "Id": 2,
+    "Title": "Sopa de Tomate",
+    "Instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
+    "ImageUrl": "https://ejemplo.com/sopa-tomate.jpg",
+    "IsGeneratedByAI": false,
+    "CreationDate": "2025-07-22T19:29:00.827027Z",
+    "UserId": 1,
+    "Ingredients": [
       {
-        "id": 8,
-        "name": "Tomate",
-        "quantity": "4 unidades"
+        "IngredientId": 3,
+        "IngredientName": "Tomate",
+        "Quantity": "2 unidades"
       },
       {
-        "id": 9,
-        "name": "Cebolla",
-        "quantity": "1 unidad"
+        "IngredientId": 7,
+        "IngredientName": "Cebolla",
+        "Quantity": "1 unidad"
       },
       {
-        "id": 10,
-        "name": "Ajo",
-        "quantity": "2 dientes"
+        "IngredientId": 8,
+        "IngredientName": "Ajo",
+        "Quantity": "2 dientes"
       },
       {
-        "id": 11,
-        "name": "Agua",
-        "quantity": "500ml"
+        "IngredientId": 9,
+        "IngredientName": "Agua",
+        "Quantity": "500ml"
       }
     ],
-    "categories": []
+    "Categories": [
+      {
+        "Id": 2,
+        "Name": "Ensaladas",
+        "Icon": "🥗"
+      }
+    ]
   }
 ]
+
 ```
 
 - **GET /api/Recipes/{id}** — Busca receta por ID
@@ -227,26 +240,42 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 ```json
 
 {
-  "id": 1,
-  "title": "Ensalada César",
-  "instructions": "Clásica ensalada con pollo y crutones.",
-  "imageUrl": "https://ejemplo.com/ensalada.jpg",
-  "isGeneratedByAI": false,
-  "creationDate": "2025-07-21T17:21:27.371921Z",
-  "userId": 1,
-  "ingredients": [
+  "Id": 2,
+  "Title": "Sopa de Tomate",
+  "Instructions": "Cocina los tomates con cebolla y ajo, licúa y sirve caliente.",
+  "ImageUrl": "https://ejemplo.com/sopa-tomate.jpg",
+  "IsGeneratedByAI": false,
+  "CreationDate": "2025-07-22T19:29:00.827027Z",
+  "UserId": 1,
+  "Ingredients": [
     {
-      "id": 3,
-      "name": "Lechuga",
-      "quantity": "1 unidad"
+      "IngredientId": 3,
+      "IngredientName": "Tomate",
+      "Quantity": "2 unidades"
     },
     {
-      "id": 4,
-      "name": "Pollo",
-      "quantity": "200g"
+      "IngredientId": 7,
+      "IngredientName": "Cebolla",
+      "Quantity": "1 unidad"
+    },
+    {
+      "IngredientId": 8,
+      "IngredientName": "Ajo",
+      "Quantity": "2 dientes"
+    },
+    {
+      "IngredientId": 9,
+      "IngredientName": "Agua",
+      "Quantity": "500ml"
     }
   ],
-  "categories": []
+  "Categories": [
+    {
+      "Id": 2,
+      "Name": "Ensaladas",
+      "Icon": "🥗"
+    }
+  ]
 }
 
 ```
@@ -261,10 +290,14 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
   "instructions": "Clásica ensalada con pollo y crutones.",
   "imageUrl": "https://ejemplo.com/ensalada.jpg",
   "isGeneratedByAI": false,
+  "creationDate": "2025-07-22T00:00:00Z",
   "userId": 1,
   "ingredients": [
-    { "name": "Lechuga", "quantity": "1 unidad" },
-    { "name": "Pollo", "quantity": "200g" }
+    { "ingredientId": 1, "ingredientName": "Lechuga", "quantity": "1 unidad" },
+    { "ingredientId": 2, "ingredientName": "Pollo", "quantity": "200g" }
+  ],
+  "categories": [
+    { "id": 2, "name": "Ensaladas", "icon": "🥗" }
   ]
 }
 
@@ -279,10 +312,13 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
   "isGeneratedByAI": false,
   "userId": 1,
   "ingredients": [
-    { "name": "Tomate", "quantity": "4 unidades" },
-    { "name": "Cebolla", "quantity": "1 unidad" },
-    { "name": "Ajo", "quantity": "2 dientes" },
-    { "name": "Agua", "quantity": "500ml" }
+    { "ingredientId": 3, "ingredientName": "Tomate", "quantity": "2 unidades" },
+    { "ingredientName": "Cebolla", "quantity": "1 unidad" },
+    { "ingredientName": "Ajo", "quantity": "2 dientes" },
+    { "ingredientName": "Agua", "quantity": "500ml" }
+  ],
+  "categories": [
+    { "ingredientId": 2, "name": "Ensaladas", "icon": "🥗" }
   ]
 }
 
@@ -301,9 +337,12 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
   "isGeneratedByAI": false,
   "userId": 1,
   "ingredients": [
-    { "name": "Lechuga", "quantity": "1 unidad" },
-    { "name": "Pollo", "quantity": "250g" },
-    { "name": "Crutones", "quantity": "50g" }
+    { "ingredientId": 1, "ingredientName": "Lechuga", "quantity": "1 unidad" },
+    { "ingredientId": 2, "ingredientName": "Pollo", "quantity": "250g" },
+    { "ingredientId": 3, "ingredientName": "Crutones", "quantity": "50g" }
+  ],
+  "categories": [
+    { "id": 2, "name": "Ensaladas", "icon": "🥗" }
   ]
 }
 
@@ -352,31 +391,6 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
     "id": 6,
     "name": "Queso rallado",
     "quantity": "50g"
-  },
-  {
-    "id": 7,
-    "name": "Aceite de oliva",
-    "quantity": "2 cucharadas"
-  },
-  {
-    "id": 8,
-    "name": "Tomate",
-    "quantity": "4 unidades"
-  },
-  {
-    "id": 9,
-    "name": "Cebolla",
-    "quantity": "1 unidad"
-  },
-  {
-    "id": 10,
-    "name": "Ajo",
-    "quantity": "2 dientes"
-  },
-  {
-    "id": 11,
-    "name": "Agua",
-    "quantity": "500ml"
   }
 ]
 ```
@@ -425,6 +439,27 @@ A continuación se muestran ejemplos de los principales endpoints expuestos por 
 ```json
 {
   "name": "Aceite de oliva",
+  "quantity": "2 cucharadas"
+}  
+```
+
+```json
+{
+  "name": "Cebolla",
+  "quantity": "1 unidad"
+}  
+```
+
+```json
+{
+  "name": "Ajo",
+  "quantity": "2 dientes"
+}  
+```
+
+```json
+{
+  "name": "Agua",
   "quantity": "2 cucharadas"
 }  
 ```
